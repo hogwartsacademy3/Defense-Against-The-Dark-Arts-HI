@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buku D.A.D.A - Tahun ke-3</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts for Elegant Typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        darkBg: '#121418',
+                        cardBg: '#1a1d24',
+                        goldAcc: '#c5a059',
+                        goldHover: '#d8b571',
+                        borderCol: '#3a3528',
+                        textCol: '#d4cbb3'
+                    },
+                    fontFamily: {
+                        serif: ['Lora', 'serif'],
+                        heading: ['Playfair Display', 'serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #121418;
+            color: #d4cbb3;
+            font-family: 'Lora', serif;
+        }
+        h1, h2, h3, h4, .font-heading {
+            font-family: 'Playfair Display', serif;
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #121418;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #3a3528;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #c5a059;
+        }
+        /* Drawer Transition */
+        .drawer {
+            transform: translateX(-100%);
+            transition: transform 0.3s ease-in-out;
+        }
+        .drawer.open {
+            transform: translateX(0);
+        }
+        .overlay {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease-in-out;
+        }
+        .overlay.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .view-section {
+            display: none;
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+        .view-section.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        p {
+            text-align: justify;
+            line-height: 1.85;
+            margin-bottom: 1.5rem;
+            font-size: 1.05rem;
+        }
+        .lesson-highlight {
+            background: rgba(197, 160, 89, 0.08);
+            border-left: 3px solid #c5a059;
+            padding: 1rem 1.25rem;
+            margin: 1.5rem 0;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen selection:bg-goldAcc selection:text-white">
+
+    <!-- Top Navigation -->
+    <nav class="sticky top-0 z-30 bg-[#0d0f12] border-b border-borderCol shadow-lg">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <!-- Hamburger Button -->
+                    <button onclick="toggleDrawer()" class="text-gray-400 hover:text-goldAcc focus:outline-none mr-4 transition-colors p-1" aria-label="Menu">
+                        <i class="fa-solid fa-bars text-2xl"></i>
+                    </button>
+                    <!-- Logo/Title -->
+                    <div class="flex items-center cursor-pointer group" onclick="navigate('home')">
+                        <i class="fa-solid fa-shield-halved text-goldAcc text-2xl mr-3 group-hover:scale-110 transition-transform duration-300"></i>
+                        <span class="font-heading font-bold text-xl tracking-wider text-goldAcc hidden sm:block">D.A.D.A</span>
+                    </div>
+                </div>
+                <!-- Right Info -->
+                <div class="text-gray-500 text-sm italic">
+                    3rd Grade • Prof. Hercule Poirot
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Drawer Overlay -->
+    <div id="drawer-overlay" class="overlay fixed inset-0 bg-black/60 z-40 backdrop-blur-sm" onclick="toggleDrawer()"></div>
+
+    <!-- Sidebar Drawer -->
+    <div id="sidebar-drawer" class="drawer fixed inset-y-0 left-0 w-[85%] max-w-sm bg-[#0d0f12] border-r border-borderCol z-50 flex flex-col shadow-2xl">
+        <div class="flex-shrink-0 p-5 flex justify-between items-center border-b border-borderCol">
+            <div class="flex items-center">
+                <i class="fa-solid fa-book-open text-goldAcc mr-3"></i>
+                <span class="font-heading font-bold text-lg text-goldAcc">Navigasi Kelas</span>
+            </div>
+            <button onclick="toggleDrawer()" class="text-gray-400 hover:text-goldAcc transition-colors p-1 rounded-full hover:bg-cardBg">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+        </div>
+        
+        <div class="flex-grow overflow-y-auto px-4 py-6">
+            <div class="space-y-2 mb-8">
+                <button onclick="navigate('home')" class="w-full flex items-center px-4 py-3 rounded-lg text-gray-400 hover:bg-cardBg hover:text-goldAcc transition-all duration-200" id="nav-home">
+                    <i class="fa-solid fa-house w-6"></i> Beranda
+                </button>
+                <button onclick="navigate('courses')" class="w-full flex items-center px-4 py-3 rounded-lg text-gray-400 hover:bg-cardBg hover:text-goldAcc transition-all duration-200" id="nav-courses">
+                    <i class="fa-solid fa-list w-6"></i> Ikhtisar Materi
+                </button>
+            </div>
+            
+            <div class="pt-2 pb-3 border-t border-borderCol">
+                <p class="px-4 text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Materi Pembelajaran</p>
+            </div>
+            
+            <div class="space-y-1 pb-10" id="lesson-nav-container">
+                <!-- Lesson links will be injected here via JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="flex-grow w-full max-w-4xl mx-auto px-5 sm:px-8 py-10 lg:py-16 relative">
+        
+        <!-- VIEW: HOME -->
+        <section id="view-home" class="view-section active">
+            <div class="text-center mb-12">
+                <i class="fa-solid fa-shield-halved text-6xl text-goldAcc mb-6 opacity-80"></i>
+                <h1 class="text-4xl md:text-5xl font-bold mb-4 tracking-wide text-goldAcc font-heading">Defense Against the Dark Arts</h1>
+                <h2 class="text-xl md:text-2xl text-gray-400 mb-8 italic">Tahun Ketiga</h2>
+            </div>
+            
+            <div class="bg-cardBg border border-borderCol rounded-lg p-8 md:p-10 shadow-xl relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-1.5 h-full bg-gradient-to-b from-goldAcc to-[#8c703b]"></div>
+                <h3 class="text-2xl font-bold mb-6 text-goldAcc border-b border-borderCol pb-4 font-heading">Pengantar Kelas oleh Professor Poirot</h3>
+                
+                <p>Selamat datang di kelas Pertahanan Terhadap Ilmu Hitam untuk Tahun Ketiga. Di bawah bimbingan saya, <strong>Professor Hercule Poirot</strong>, kelas ini akan berjalan sedikit berbeda dari apa yang mungkin Anda bayangkan. Banyak penyihir muda mengira bahwa pertahanan diri adalah soal siapa yang bisa meneriakkan mantra paling keras atau siapa yang memiliki tongkat sihir dengan inti paling agresif. Itu adalah kekeliruan fatal yang sangat berbahaya.</p>
+                
+                <p>Mata manusia sangat mudah ditipu oleh ilusi, kegelapan, dan rasa takut yang tiba-tiba. Namun, nalar—apa yang suka saya sebut sebagai <em>sel-sel kelabu kecil</em> di dalam kepala Anda—tidak akan pernah membohongi Anda jika dilatih dengan metode ilmiah dan observasi yang teliti. Sebelum Anda merapal satu mantra pun, Anda harus belajar mengamati, menganalisis, dan menyimpulkan hakikat dari ancaman yang ada di hadapan Anda.</p>
+                
+                <p>Kurikulum 8 pertemuan yang tersusun di dalam buku ini dirancang secara sistematis dari dasar hingga tingkat taktis lanjutan. Kita akan memulainya dari penguasaan spektrum cahaya dan mantra penyingkap, membedah anatomi energi sihir dan bahaya kelelahan magis, hingga menganalisis makhluk-makhluk gelap dari yang berukuran mikro hingga monster hibrida hasil eksperimen ilegal.</p>
+
+                <div class="lesson-highlight">
+                    "Seni bertahan hidup magis tidak semata-mata bergantung pada seberapa keras Anda mengayunkan tongkat sihir. Ini adalah kombinasi dari observasi yang cermat, deduksi yang dingin, dan tindakan yang diukur dengan presisi sempurna."
+                </div>
+
+                <p>Silakan gunakan navigasi menu di bagian atas untuk membuka halaman <strong>Ikhtisar Materi</strong> atau langsung melompat ke bab pertemuan yang ingin Anda pelajari. Bacalah dengan seksama dan pastikan sel-sel kelabu Anda bekerja aktif sepanjang tahun ajaran ini.</p>
+
+                <div class="mt-10 text-center">
+                    <button onclick="navigate('courses')" class="bg-goldAcc text-darkBg px-8 py-3 rounded font-bold tracking-wide hover:bg-goldHover transition-all transform hover:-translate-y-1 shadow-[0_4px_15px_rgba(197,160,89,0.3)] inline-flex items-center">
+                        Mulai Belajar <i class="fa-solid fa-chevron-right ml-2"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW: COURSES (Overview) -->
+        <section id="view-courses" class="view-section">
+            <div class="flex items-center mb-10 border-b border-borderCol pb-6">
+                <i class="fa-solid fa-book-open text-4xl text-goldAcc mr-4"></i>
+                <h2 class="text-3xl md:text-4xl font-bold text-goldAcc font-heading">Ikhtisar Materi Kelas</h2>
+            </div>
+            
+            <p class="mb-10 text-gray-300">Berikut adalah silabus lengkap 8 pertemuan D.A.D.A 101. Silakan pilih bab di bawah ini untuk mempelajari modul materi naratif secara komprehensif.</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="courses-grid">
+                <!-- Course cards injected via JS -->
+            </div>
+        </section>
+
+        <!-- VIEW: LESSON (Dynamic) -->
+        <section id="view-lesson" class="view-section">
+            <div class="bg-cardBg border border-borderCol rounded-lg p-6 md:p-12 shadow-2xl relative">
+                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-goldAcc to-transparent opacity-50"></div>
+                
+                <!-- Breadcrumb -->
+                <div class="mb-10 text-sm flex items-center text-gray-500">
+                    <button onclick="navigate('courses')" class="hover:text-goldAcc transition-colors">Ikhtisar Materi</button>
+                    <i class="fa-solid fa-chevron-right mx-3 text-[10px]"></i>
+                    <span class="text-goldAcc" id="lesson-breadcrumb">Bab 1</span>
+                </div>
+                
+                <header class="mb-10 text-center">
+                    <h1 class="text-3xl md:text-4xl font-bold text-goldAcc mb-6 leading-tight font-heading" id="lesson-title">Judul Materi</h1>
+                    <div class="w-24 h-px bg-goldAcc/40 mx-auto mb-6"></div>
+                    <p class="text-lg text-gray-400 italic" id="lesson-summary">Ringkasan materi</p>
+                </header>
+                
+                <div class="text-textCol text-[1.05rem]" id="lesson-content">
+                    <!-- Lesson content injected here -->
+                </div>
+
+                <!-- Footer Navigation inside Lesson -->
+                <div class="mt-16 pt-8 border-t border-borderCol flex justify-between items-center bg-darkBg -mx-6 md:-mx-12 -mb-6 md:-mb-12 p-6 md:p-8 rounded-b-lg">
+                    <button id="btn-prev" class="text-sm md:text-base text-gray-400 hover:text-goldAcc flex items-center transition-colors px-3 py-2 border border-transparent hover:border-borderCol rounded hover:bg-cardBg">
+                        <i class="fa-solid fa-chevron-left mr-2"></i> <span class="hidden sm:inline">Bab Sebelumnya</span><span class="sm:hidden">Sblm</span>
+                    </button>
+                    <button id="btn-next" class="text-sm md:text-base text-gray-400 hover:text-goldAcc flex items-center transition-colors px-3 py-2 border border-transparent hover:border-borderCol rounded hover:bg-cardBg">
+                        <span class="hidden sm:inline">Bab Selanjutnya</span><span class="sm:hidden">Lanjut</span> <i class="fa-solid fa-chevron-right ml-2"></i>
+                    </button>
+                    <button id="btn-finish" class="hidden text-sm md:text-base font-bold text-goldAcc hover:text-white transition-colors px-4 py-2 border border-goldAcc/50 rounded hover:bg-goldAcc/10">
+                        Selesai
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-[#0d0f12] border-t border-borderCol py-8 text-center text-gray-500 text-sm mt-auto">
+        <p class="mb-2 tracking-widest font-heading font-bold text-gray-400">DEFENSE AGAINST THE DARK ARTS</p>
+        <p>Curriculum Grade 3 — Professor Hercule Poirot</p>
+    </footer>
+
+    <!-- JavaScript Logic -->
+    <script>
+        const lessons = [
+            {
+                id: 1,
+                title: "Pertemuan 1: Bright Lights and A Little Revealer",
+                summary: "Eksplorasi spektrum cahaya magis (Lumos, Nox, Lumos Solem) dan analisis penggunaan Mantra Penyingkap (Verdimillious).",
+                content: `
+                    <p>Selamat datang di pertemuan pertama kita. Di dalam investigasi sebuah kasus maupun dalam pertempuran magis, kegelapan adalah sekutu terbesar bagi musuh Anda. Kegelapan menyembunyikan bukti, merancukan persepsi spasial, dan memicu kepanikan yang melumpuhkan rasionalitas. Oleh karena itu, langkah awal yang mutlak dalam Pertahanan Terhadap Ilmu Hitam adalah kemampuan untuk mengendalikan spektrum cahaya secara presisi dan efektif.</p>
+                    
+                    <p>Pelajaran kita dimulai dari dasar yang sering diremehkan: <strong>Mantra Wand-Lighting Charm (<em>Lumos</em>)</strong> dan pemadamnya, <strong>The Wand-Extinguishing Charm (<em>Nox</em>)</strong>. Diciptakan oleh Levina Monkstanley pada abad ke-18, Lumos mengalirkan energi magis dari inti tongkat untuk menghasilkan pendaran cahaya putih keemasan di ujungnya. Keutamaan mantra ini terletak pada efisiensinya yang sangat rendah dalam menguras energi magis penyihir. Namun, seorang penyihir taktis harus menguasai <em>Nox</em> dengan kecepatan reaksi yang sama tingginya. Menyalakan cahaya di tengah ruang berbahaya dapat mengungkap lokasi Anda kepada ancaman yang tak terlihat; kemampuan memadamkan cahaya dalam sekejap mata sama pentingnya dengan menyalakannya.</p>
+                    
+                    <div class="lesson-highlight">
+                        "Mata manusia mudah sekali tertipu oleh bayangan. Namun seorang penyihir yang analitis tidak hanya mencari cahaya untuk melihat, melainkan menggunakan cahaya sebagai instrumen identifikasi."
+                    </div>
+
+                    <p>Ketika Anda berhadapan dengan kegelapan magis yang lebih pekat atau makhluk gelap yang sensitif terhadap foton intensitas tinggi, Lumos standar tidak akan cukup. Di sinilah kita menggunakan variasi tingkat lanjut: <strong><em>Lumos Solem</em></strong>. Mantra ini memproyeksikan pancaran cahaya yang tidak hanya terang, tetapi juga memancarkan spektrum panas dan radiasi yang meniru sinar matahari alami secara persis. Mantra ini adalah pertahanan utama saat Anda terjerat oleh tanaman gelap seperti <em>Devil's Snare</em> (Jerat Iblis), yang secara biologis akan mengendurkan cengkeramannya dan mengerut saat terpapar sinar matahari buatan ini.</p>
+
+                    <p>Selanjutnya, mari kita bedah instrumen investigasi yang sangat berharga: <strong>Mantra Penyingkap (<em>Verdimillious</em>)</strong>. Sihir gelap sangat erat kaitannya dengan penyembunyian—baik berupa objek yang disamarkan dengan <em>Disillusionment Charm</em>, jalan rahasia yang dikunci sihir, maupun pintu tersembunyi yang dibuat oleh sihir hitam. Saat dirapal dengan lenturan pergelangan tangan memutar dan diakhiri hentakan lurus, Verdimillious memancarkan ledakan percikan energi berwarna hijau zamrud. Percikan ini akan menyapu area sekitar Anda dan membuat objek-objek gaib atau struktur ilusi yang tersembunyi menjadi terlihat dalam wujud substansi semi-transparan selama beberapa saat. Jangan pernah melangkah ke dalam ruangan yang memicu kecurigaan sel-sel kelabu Anda tanpa merapal Verdimillious terlebih dahulu.</p>
+                `
+            },
+            {
+                id: 2,
+                title: "Pertemuan 2: Types of Spells and Magical Exhaustion",
+                summary: "Taksonomi Sihir Gelap (Jinx, Hex, Curse) serta mekanisme biologis dan pencegahan Kelelahan Magis.",
+                content: `
+                    <p>Pada pertemuan kedua ini, kita harus menyusun taksonomi yang jelas mengenai apa yang kita lawan. Dalam terminologi magis baku, tidak semua sihir berbahaya diciptakan setara. Kita membagi sihir ofensif gelap ke dalam tiga tingkatan hierarki berdasarkan tingkat intensitas, niat (intent), dan efek kerusakan yang ditimbulkannya: Jinx, Hex, dan Curse (Kutukan).</p>
+
+                    <p><strong>1. Jinx (Mantra Pengganggu):</strong> Ini adalah tingkatan sihir gelap yang paling minor dan berteknologi rendah. Jinx dirancang terutama untuk mengganggu, mengagalkan aksi, atau memberikan ketidaknyamanan ringan pada korbannya. Contoh klasik adalah <em>Flipendo</em> (Knockback Jinx) atau <em>Furnunculus</em> (Pimple Jinx). Jinx umumnya mudah dipatahkan dengan counter-curse dasar dan tidak meninggalkan efek jangka panjang pada struktur fisik korban.</p>
+
+                    <p><strong>2. Hex (Mantra Penderitaan Moderat):</strong> Hex membawa niat yang jauh lebih memusuhi. Efeknya secara aktif dirancang untuk merugikan, memberi penderitaan fisik sedang, atau merusak fungsi organ tubuh sementara waktu. Mantra seperti <em>Bat-Bogey Hex</em> atau <em>Densaugeo</em> masuk dalam kategori ini. Berhadapan dengan Hex membutuhkan pertahanan perisai aktif (seperti <em>Protego</em>) karena efeknya dapat melumpuhkan daya juang Anda di tengah pertempuran.</p>
+
+                    <p><strong>3. Curse / Kutukan (Sihir Hitam Murni):</strong> Ini adalah pเวก puncak dari sihir gelap. Kutukan digerakkan oleh niat murni untuk menghancurkan, mengendalikan, atau menimbulkan penderitaan yang tak terbayangkan. Kutukan mengubah sifat alami objek atau tubuh korban secara permanen jika tidak ditangani oleh Ahli Penyembuh (Healer). Tiga Kutukan Tak Terampuni (Unforgivable Curses) berada di puncak kategori ini. Karakteristik utama Kutukan adalah resistensinya yang tinggi terhadap mantra pembalik standar.</p>
+
+                    <div class="lesson-highlight">
+                        "Tubuh manusia adalah wadah bagi energi magis. Menguras wadah tersebut tanpa perhitungan adalah bentuk kegagalan analisis paling konyol dari seorang penyihir."
+                    </div>
+
+                    <p>Sekarang, mari kita bahas fenomena medis yang sering menjadi penyebab kekalahan para penyihir muda: <strong>Magical Exhaustion (Kelelahan Magis)</strong>. Sihir bukanlah sumber daya tanpa batas yang mengalir spontan tanpa konsumsi fisiologis. Setiap kali Anda memancarkan sihir melalui tongkat Anda, terjadi konversi metabolik yang kompleks di dalam jaringan saraf dan inti sihir tubuh Anda.</p>
+
+                    <p>Gejala kelelahan magis berkembang secara bertahap: diawali dengan tremor halus pada tangan yang memegang tongkat, penurunan akurasi pelafalan (incantation), pusing vertikal, hingga pendarahan pada saluran pernapasan atas (epistaksis). Jika seorang penyihir terus memaksakan merapal mantra tingkat tinggi saat mengalami kelelahan ekstrem, hasilnya adalah kekacauan pelepasan sihir liar yang dapat merusak tongkat sihir mereka sendiri atau menyebabkan kehilangan kesadaran (pingsan koma). Dalam duel, efisiensi adalah kuncinya: gunakan gerakan yang minimal, hindari serangan berbahaya alih-alih selalu menahannya dengan perisai magis yang berat, dan hemat energi Anda untuk momen yang menentukan.</p>
+                `
+            },
+            {
+                id: 3,
+                title: "Pertemuan 3: Imps and Bowtruckles",
+                summary: "Analisis zoologi magis terhadap Imp (rawa) dan Bowtruckle (penjaga pohon tongkat sihir).",
+                content: `
+                    <p>Pertemuan ketiga kita membawa kita pada analisis zoologi terhadap dua makhluk berukuran kecil yang sering kali menimbulkan masalah besar jika ditangani dengan cara yang salah: Imp dan Bowtruckle. Kedua makhluk ini menuntut pendekatan pertahanan yang sangat berbeda—yang satu membutuhkan tindakan represif yang cepat, sementara yang lain membutuhkan keahlian diplomasi alamiah.</p>
+
+                    <p><strong>Imp (<em>M.O.M. Classification: XX</em>):</strong> Sering kali dikira sebagai Pixie oleh mata yang tidak terlatih, Imp memiliki habitat asli di daerah rawa-rawa dan tepi sungai di dataran Inggris dan Irlandia. Berukuran tinggi sekitar 6 hingga 8 inci, Imp tidak memiliki sayap (berbeda dengan Cornish Pixie yang dapat terbang). Kulit mereka kasar, berwarna cokelat gelap atau abu-abu lumpur, dan mereka memiliki kecenderungan bawaan untuk perilaku destruktif skala kecil.</p>
+
+                    <p>Imp sangat menyukai jebakan fisik: mereka suka mendorong pelancong ke dalam lumpur hisap, menyembunyikan benda-benda kecil, dan menyerang dalam kelompok kecil. Karena tingkat kecerdasan mereka yang rendah dan dorongan humor mereka yang kasar, kompromi tidak akan berhasil pada Imp. Metode pertahanan terbaik adalah penggunaan <em>Knockback Jinx</em> (Flipendo) untuk menjauhkan mereka, diikuti dengan Mantra Pembeku (<em>Immobulus</em>) untuk menghentikan pergerakan mereka secara kolektif.</p>
+
+                    <div class="lesson-highlight">
+                        "Jangan pernah mengukur bahaya suatu makhluk dari ukuran fisiknya. Sebuah jarum kecil yang beracun sama mematikannya dengan sebilah pedang besar jika mengenai sasaran yang tepat."
+                    </div>
+
+                    <p><strong>Bowtruckle (<em>M.O.M. Classification: XX</em>):</strong> Makhluk ini adalah penjaga pohon (tree-guardian) yang hidup di pohon-pohon yang memiliki kualitas kayu untuk pembuatan tongkat sihir (seperti pohon Rowan, Elder, atau Willow). Berukuran sangat kecil—sekitar 8 inci—tubuh Bowtruckle tampak seperti ranting kayu kecil berserat dengan dua mata berwarna cokelat yang terkamuflase dengan sempurna di antara dedaunan.</p>
+
+                    <p>Secara umum, Bowtruckle adalah makhluk yang sangat pemalu dan damai. Namun, jika pohon tempat tinggal mereka diancam—misalnya oleh penebang kayu atau penyihir yang mencoba mengambil kayu tongkat secara kasar—Bowtruckle akan berubah menjadi sangat agresif. Mereka akan melompat dari dahan dan membidik mata penyerang menggunakan jari-jari mereka yang panjang, kurus, dan luar biasa tajam.</p>
+
+                    <p>Menyerang Bowtruckle dengan sihir ofensif adalah tindakan tidak bijaksana yang dapat merusak kayu tongkat yang berharga di pohon tersebut. Strategi pertahanan terbaik adalah <em>penyuapan taktis</em>. Bowtruckle sangat menyukai makanan berupa kutu kayu (woodlice) dan telur Fairy. Dengan menawarkan segenggam kutu kayu di alas pohon, Anda dapat mengalihkan perhatian Bowtruckle secara total, memungkinkan Anda mengambil dahan kayu yang dibutuhkan dengan aman tanpa perlu menumpahkan darah.</p>
+                `
+            },
+            {
+                id: 4,
+                title: "Pertemuan 4: Gnomes and Doxies",
+                summary: "Penanganan hama pemukiman magis: Pengusiran Gnome taman dan remediasi biokimia Doxy beracun.",
+                content: `
+                    <p>Memasuki pertemuan keempat, kita memfokuskan analisis kita pada dua spesies hama pemukiman magis yang paling sering dijumpai di kediaman penyihir: Gnome dan Doxy. Meskipun kerap dianggap sebagai masalah domestik biasa, kecerobohan dalam menangani mereka dapat berakibat pada cedera fisik dan keracunan sistemik yang berbahaya.</p>
+
+                    <p><strong>Gnome (<em>Jarvey/Gnome - M.O.M. Classification: XX</em>):</strong> Gnome adalah hama kebun yang sangat umum di seluruh wilayah Eropa Utara dan Amerika. Memiliki tinggi sekitar satu kaki, mereka ditandai dengan kepala berproporsi terlalu besar yang menyerupai kentang berbatu, kaki berotot bersisik, dan gigi tajam seperti serangga. Gnome membuat jaringan liang yang rumit di bawah tanah, merusak akar tanaman magis dan mencuri vegetasi kebun.</p>
+
+                    <p>Metode penanganan Gnome tidak memerlukan sihir bertarung yang rumit. Prosedur standar yang diakui adalah <em>Gnoming (Pengusiran Gnome)</em>. Anda harus menangkap Gnome pada kakinya, memutarnya di udara dalam gerakan melingkar beberapa kali untuk membuat jaringan vestibular di kepalanya pusing berat, lalu melemparkannya melewati pagar kebun. Rasa pusing yang ekstrem membuat Gnome kehilangan orientasi spasial untuk menemukan kembali jalur masuk ke liangnya. Untuk pencegahan permanen, penggunaan Jarvey (makhluk mirip musang magis) dapat dikerahkan untuk memburu mereka secara alami.</p>
+
+                    <div class="lesson-highlight">
+                        "Dalam menghadapi hama beracun seperti Doxy, kepanikan adalah musuh terburuk Anda. Gunakan agen penetralisir yang tepat, bukan ayunan tongkat sihir secara acak."
+                    </div>
+
+                    <p><strong>Doxy / Biting Fairy (<em>M.O.M. Classification: XXX</em>):</strong> Doxy sering kali salah diidentifikasi oleh awam sebagai Fairy (Peri) karena tubuh mereka yang kecil dan bersayap. Namun, observasi yang cermat akan menunjukkan perbedaan radikal: Doxy tertutup bulu hitam pendek, memiliki dua pasang tangan dan dua pasang kaki, serta sayap tebal bersisik menyerupai sayap kumbang.</p>
+
+                    <p>Doxy adalah ancaman kesehatan yang serius. Mereka berkembang biak di iklim dingin dan sangat suka bersarang di lipatan tirai tua, rumah kosong, atau loteng yang lembap. Doxy memiliki dua baris gigi tajam yang menyuntikkan racun (venom) berkecepatan reaksi tinggi saat menggigit. Gigitan Doxy menyebabkan demam tinggi, pembengkakan lokal yang parah, dan dalam kasus korban anak-anak, dapat memicu syok anafilaksis jika tidak segera diberi formula Penawar Racun Doxy (Doxy Venom Antidote).</p>
+
+                    <p>Saat membersihkan sarang Doxy, penggunaan sihir pertempuran langsung sangat tidak efisien karena jumlah mereka yang sangat banyak. Prosedur pertahanan baku adalah mengaplikasikan racun semprot biokimia yang disebut <strong><em>Doxycide</em></strong>. Cairan berwarna gelap ini akan memparalisis sistem saraf Doxy secara instan saat terhirup, membuat mereka jatuh pingsan dan dapat disingkirkan serta dibuang secara aman tanpa risiko terkena gigitan.</p>
+                `
+            },
+            {
+                id: 5,
+                title: "Pertemuan 5: Gargoyles and Hags",
+                summary: "Pembedahan taktis atas konstruksi animatif Gargoyle dan analisis psikologis serta bahaya fisik Hag.",
+                content: `
+                    <p>Pada pertemuan kelima, kita melangkah ke analisis ancaman yang jauh lebih pekat dan berbahaya. Kita akan membedah Gargoyle—sebuah entitas batu yang dihidupkan sihir—dan Hag, makhluk humanoid gelap yang memiliki kecenderungan kanibalisme. Di sini, sel-sel kelabu Anda harus bekerja ekstra keras untuk membedakan antara pertahanan fisik struktural dan pertahanan biologis.</p>
+
+                    <p><strong>Gargoyle (Konstruksi Animatif Batu):</strong> Gargoyle yang kita bahas dalam konteks D.A.D.A bukanlah sekadar ukiran arsitektur gotik biasa, melainkan patung batu yang diinfusi dengan mantra animasi perlindungan tingkat tinggi (seperti variasi <em>Piertotum Locomotor</em>) untuk berfungsi sebagai penjaga kargo, kastil, atau vault rahasia di daratan Eropa. Gargoyle umumnya dipahat menyerupai monster bersayap, naga, atau ghauly humanoid.</p>
+
+                    <p>Pertahanan melawan Gargoyle menuntut pemahaman struktur material. Karena tubuh mereka murni terbuat dari granit atau batu kapur padat, mantra sihir standar seperti <em>Stupefy</em> (Mantra Pembius) atau jinx pemotong biasa tidak akan memberikan dampak apapun pada jaringan batu mereka. Untuk melumpuhkan Gargoyle, strategi defensif yang rasional adalah menembakkan mantra yang merusak integritas molekuler materialnya—seperti <em>Reducto</em> (Mantra Penghancur) yang dibidikkan tepat pada artikulasi persendian batu mereka—atau menggunakan sihir pelumas untuk membuat pijakan mereka kehilangan gesekan hingga terjatuh.</p>
+
+                    <div class="lesson-highlight">
+                        "Ketika berhadapan dengan makhluk yang memiliki naluri kanibalisme seperti Hag, diplomasi adalah ilusi berbahaya. Jarak adalah pelindung terbaik Anda."
+                    </div>
+
+                    <p><strong>Hag (<em>M.O.M. Classification: XXX</em>):</strong> Hag adalah makhluk humanoid wanita yang memiliki reputasi kelam dalam sejarah sihir. Meskipun mereka memiliki kemampuan untuk menggunakan bentuk sihir tingkat rendah dan berbicara dalam bahasa manusia, Hag diklasifikasikan sebagai <em>Beast/Being</em> dengan status bahaya tinggi karena sifat alami mereka yang tidak dapat direformasi dan kecenderungan diet kanibalisme pada daging manusia—khususnya anak-anak.</p>
+
+                    <p>Secara fisik, Hag dicirikan oleh kulit berduri atau bersisik kasar, kuku jari yang sangat keras dan tajam seperti cakar baja, serta ketahanan fisik alami yang luar biasa tinggi terhadap mantra kutukan biasa. Hag sering menggunakan sihir ilusi sederhana (seperti penyamaran wujud nenek tua yang tidak berdaya) untuk memancing korban yang tidak waspada ke dalam gubuk atau rawa tempat tinggal mereka.</p>
+
+                    <p>Protokol pertahanan saat mengidentifikasi Hag adalah mengabaikan semua bentuk tipu daya verbal yang mereka lontarkan. Karena ketahanan fisik mereka yang tinggi, duel jarak dekat adalah kesalahan fatal. Penyihir harus menjaga jarak minimal 15 meter, memanfaatkan mantra pendorong berdaya ledak tinggi (seperti <em>Flipendo Maxima</em>) untuk menjatuhkan mereka, dan segera keluar dari wilayah perburuan mereka sembari menghubungi Departemen Pengawasan Makhluk Gaib Kementrian Sihir.</p>
+                `
+            },
+            {
+                id: 6,
+                title: "Pertemuan 6: Ghost, Poltergeists, and Gytrashes",
+                summary: "Klasifikasi spektral: Imprint memori hantu, manifestasi non-humanoid Poltergeist, dan anjing bayangan Gytrash.",
+                content: `
+                    <p>Pertemuan keenam merupakan studi mendalam mengenai entitas spektral dan ektoplasmik. Masyarakat awam sering kali mencampuradukkan Hantu, Poltergeist, dan Gytrash ke dalam satu kategori acak yang mereka sebut 'roh'. Ini adalah kecerobohan akademis yang sangat besar. Ketiga entitas ini memiliki asal-usul molekuler, perilaku, dan metode penanganan yang sama sekali berbeda.</p>
+
+                    <p><strong>1. Ghost / Hantu (Imprint Ektoplasmik):</strong> Hantu adalah cetakan ektoplasmik (imprint) dari jiwa seorang penyihir yang telah meninggal namun memilih untuk tetap terikat pada dunia fana karena rasa takut akan kematian atau urusan yang belum selesai. Hantu tidak memiliki substansi fisik padat; mereka tembus pandang, tidak berkeringat, dan hanya dapat memancarkan suhu dingin ekstrem saat melewati tubuh manusia.</p>
+
+                    <p>Hantu pada dasarnya tidak berbahaya dan mempertahankan kepribadian, memori, serta intelektual saat mereka masih hidup. Mereka tidak dapat diserang dengan sihir fisik atau mantra kutukan. Pertahanan melawan hantu yang mengganggu tidak dilakukan dengan mantra pertarungan, melainkan dengan pendekatan diplomasi verbal atau menggunakan sihir pembatas ektoplasma khusus.</p>
+
+                    <p><strong>2. Poltergeist (Manifestasi Non-Humanoid):</strong> Sangat berbeda dengan hantu, Poltergeist (seperti Peeves di Hogwarts) tidak pernah menjadi manusia dan tidak pernah mati. Poltergeist adalah roh kekacauan murni yang terbentuk dari akumulasi emosi negatif, kenakalan, dan energi kekacauan yang terperangkap di sebuah bangunan tua yang dihuni banyak orang selama bertahun-tahun.</p>
+
+                    <p>Poltergeist memiliki wujud fisik semi-padat: mereka dapat memegang objek, melempar barang-barang berat, dan memanipulasi lingkungan secara fisik. Karena mereka bukan jiwa yang pernah hidup, Anda tidak dapat 'mengusir' atau membunuh Poltergeist dengan cara biasa. Namun, pergerakan destruktif mereka dapat diredam menggunakan mantra khusus seperti <strong><em>Waddiwasi</em></strong> (yang menembakkan proyektil kecil kembali ke hidung mereka) atau <strong><em>Langlock</em></strong> untuk mengunci lidah mereka saat mencoba merapal mantra gangguan.</p>
+
+                    <div class="lesson-highlight">
+                        "Kegelapan malam dan ketakutan irasional adalah sarana berburu favorit bagi Gytrash. Gunakan foton intensitas tinggi untuk memecah formasi bayangan mereka."
+                    </div>
+
+                    <p><strong>3. Gytrash (Anjing Spektral Bayangan - <em>M.O.M. Classification: XXX</em>):</strong> Gytrash adalah roh berbentuk anjing besar (terkadang berwujud kuda atau serigala) yang berkeliaran di daerah terpencil dan jalanan sunyi di dataran Inggris pada malam hari. Gytrash memiliki mata yang bersinar dengan pendaran cahaya hijau redup dan tubuh yang terbentuk dari asap ektoplasmik tebal.</p>
+
+                    <p>Gytrash berburu dengan cara yang licik: mereka bersikap seolah-olah ingin menjadi pemandu jalan bagi pelancong yang tersesat di tengah malam, namun secara perlahan menuntun korban masuk lebih dalam ke jurang, rawa hisap, atau sarang berbahaya sebelum menyerang mental korban hingga pingsan. Pertahanan mutlak melawan Gytrash kembali pada ilmu dasar Pelajaran 1 kita: <strong><em>Lumos Solem</em></strong> atau <strong><em>Verdimillious</em></strong>. Pancaran cahaya pekat yang mendadak akan membakar wujud ektoplasmik Gytrash dan memaksa molekul bayangan mereka terurai kembali ke udara malam.</p>
+                `
+            },
+            {
+                id: 7,
+                title: "Pertemuan 7: Fire Crabs",
+                summary: "Analisis biologi dan pertahanan taktis melawan Kepiting Api (Fire Crab) dari Kepulauan Fiji.",
+                content: `
+                    <p>Selamat datang di pertemuan ketujuh. Hari ini kita membedah spesimen fauna magis yang sangat eksotis namun memiliki potensi bahaya termal yang sangat tinggi jika tidak ditangani dengan pengetahuan taktis yang tepat: Fire Crab (Kepiting Api).</p>
+
+                    <p><strong>Anatomi dan Karakteristik (<em>M.O.M. Classification: XXX</em>):</strong> Terlepas dari namanya, Fire Crab sebenarnya sangat sedikit memiliki kemiripan biologis dengan kepiting biasa. Makhluk ini lebih menyerupai kura-kura darat berukuran besar yang memiliki cangkang keras bertatahkan berbagai jenis batu permata berharga (seperti rubi, zamrud, dan safir). Habitat asli spesies ini adalah pesisir pantai pulau Fiji, di mana mereka dilindungi secara ketat dalam cagar alam magis internasional.</p>
+
+                    <p>Ancaman utama dari Fire Crab timbul dari dua faktor: pemburu liar (poachers) yang mengincar cangkang permata mereka, serta mekanisme pertahanan alami makhluk ini saat merasa terancam atau terpojok. Fire Crab dilengkapi dengan organ pembakaran internal khusus di bagian posterior (belakang) tubuh mereka. Saat terkejut atau marah, Fire Crab akan menembakkan ledakan api yang sangat pekat dan pancaran cairan membara dari bagian belakang cangkangnya.</p>
+
+                    <div class="lesson-highlight">
+                        "Aturan emas dalam berhadapan dengan Fire Crab sangat sederhana namun krusial: posisikan diri Anda di depan atau sampingnya, dan jangan pernah berdiri di area belakang tembakannya."
+                    </div>
+
+                    <p><strong>Strategi Penanganan Taktis:</strong> Jarak tembak api dari Fire Crab dapat mencapai hingga 3 meter dengan suhu yang cukup tinggi untuk membakar jubah penyihir dalam hitungan detik dan menyebabkan luka bakar derajat tiga pada jaringan kulit. Oleh karena itu, observasi posisi adalah segalanya dalam duel atau relokasi makhluk ini.</p>
+
+                    <p>1. <strong>Penguasaan Vektor Posisional:</strong> Saat ditugaskan mengamankan atau memindahkan Fire Crab, Anda harus selalu mendekatinya dari sektor depan (menghadap kepalanya). Fire Crab tidak memiliki kemampuan rotasi api ke arah depan tubuhnya sendiri.</p>
+
+                    <p>2. <strong>Aplikasi Mantra Defensif:</strong> Jika Anda terpaksa menahan serangan api dari belakangnya, penggunaan Mantra Pemadam Api (<em>Aqua Eructo</em>) atau Mantra Perisai Termal adalah prosedur standar. Untuk melumpuhkan pergerakan mereka secara aman tanpa merusak cangkangnya, manfaatkan Mantra Melayang (<em>Wingardium Leviosa</em>) pada cangkang atasnya untuk mengangkatnya beberapa kaki di udara; saat kakinya tidak menyentuh tanah, Fire Crab akan kehilangan momentum tembakannya secara signifikan.</p>
+                `
+            },
+            {
+                id: 8,
+                title: "Pertemuan 8: Blast-Ended Skrewts",
+                summary: "Studi kasus ancaman ekstrem: Biologi, titik lemah anatomis, dan taktik penanganan Skrewt Ujung-Meledak.",
+                content: `
+                    <p>Kita telah tiba di pertemuan terakhir dari rangkaian kurikulum D.A.D.A 101. Subjek kita hari ini adalah salah satu hasil eksperimen pembiakan silang yang paling tidak stabil, agresif, dan berbahaya dalam sejarah pemeliharaan satwa magis modern: Blast-Ended Skrewt (Skrewt Ujung-Meledak).</p>
+
+                    <p><strong>Asal-Usul dan Anatomi Monster Hibrida:</strong> Skrewt Ujung-Meledak diciptakan melalui pembiakan silang ilegal antara Manticore dan Fire Crab. Hasilnya adalah monster yang menggabungkan armor fisik yang hampir kebal sihir dari Fire Crab dengan agresi membunuh murni dan senjata penyengat beracun dari Manticore.</p>
+
+                    <p>Saat baru menetas, Skrewt tampak seperti kepiting cacat bertubuh pucat, tanpa mata, dan berbau seperti ikan busuk. Namun, pertumbuhan mereka terjadi secara eksponensial. Saat dewasa, panjang tubuh mereka dapat mencapai hingga 10 kaki (sekitar 3 meter), terbungkus penuh oleh cangkang armor berwarna abu-abu gelap yang sangat tebal dan keras. Skrewt jantan memiliki alat penyengat beracun seperti kalajengking di atas ekornya, sementara Skrewt betina memiliki alat pengisap darah di bagian perutnya.</p>
+
+                    <div class="lesson-highlight">
+                        "Menyerang cangkang keras Blast-Ended Skrewt secara langsung adalah buang-buang energi magis. Penyihir analitis selalu mencari titik lemah anatomis di mana armor tidak terbentuk."
+                    </div>
+
+                    <p><strong>Dinamika Serangan dan Titik Lemah:</strong> Nama 'Blast-Ended' berasal dari fakta bahwa bagian ujung belakang makhluk ini dapat memicu ledakan energi termal yang kuat secara berkala. Ledakan ini digunakan oleh Skrewt tidak hanya untuk membakar musuh di belakangnya, tetapi juga sebagai mekanisme pendorong otomatis yang melontarkan tubuh raksasanya meluncur ke depan dengan kecepatan sangat tinggi untuk menabrak mangsanya.</p>
+
+                    <p>Hampir seluruh permukaan atas dan samping Skrewt ditutupi armor cangkang yang memantulkan kembali sebagian besar jinx, pembius (<em>Stupefy</em>), dan kutukan biasa. Menembakkan mantra ke arah cangkangnya berisiko memantulkan sihir tersebut kembali mengenai diri Anda sendiri.</p>
+
+                    <p>Satu-satunya <strong>titik lemah anatomis (vulnerable point)</strong> dari Blast-Ended Skrewt adalah bagian bawah perutnya (underside), yang tidak terlindungi oleh armor keras dan berkulit lunak. Oleh karena itu, taktik pertempuran melawannya menuntut eksekusi dua langkah yang presisi:</p>
+
+                    <p>1. <strong>Langkah 1 (Evasi Taktis):</strong> Saat Skrewt bersiap meluncurkan dirinya menggunakan ledakan belakangnya, jangan mencoba menahannya. Lakukan manuver menghindar ke samping secara cepat untuk membuat Skrewt meluncur melewati Anda.</p>
+
+                    <p>2. <strong>Langkah 2 (Eksploitasi Perut Lunak):</strong> Saat Skrewt terangkat ke udara atau terbalik akibat efek ledakannya sendiri, bidikkan mantra pembeku atau mantra penahan (seperti <em>Impedimenta</em> atau <em>Stupefy</em>) secara langsung pada jaringan perut lunaknya. Hanya dengan mengenai bagian bawah tubuh inilah sihir Anda dapat menembus sistem sarafnya dan melumpuhkan ancaman tersebut.</p>
+
+                    <p>Pelajaran terpenting dari analisis Skrewt ini adalah puncak dari seluruh filosofi kelas kita: tidak peduli seberapa mengerikan atau kebalnya suatu ancaman tampak di mata Anda, penggunaan logika, analisis anatomi, dan ketenangan pikiran akan selalu menemukan celah pertahanan untuk meraih kemenangan secara elegan.</p>
+                `
+            }
+        ];
+
+        let currentView = 'home';
+
+        // DOM Elements
+        const drawer = document.getElementById('sidebar-drawer');
+        const overlay = document.getElementById('drawer-overlay');
+        const lessonNavContainer = document.getElementById('lesson-nav-container');
+        const coursesGrid = document.getElementById('courses-grid');
+        
+        // Navigation Buttons
+        const navHome = document.getElementById('nav-home');
+        const navCourses = document.getElementById('nav-courses');
+
+        // Lesson View Elements
+        const lessonBreadcrumb = document.getElementById('lesson-breadcrumb');
+        const lessonTitle = document.getElementById('lesson-title');
+        const lessonSummary = document.getElementById('lesson-summary');
+        const lessonContent = document.getElementById('lesson-content');
+        const btnPrev = document.getElementById('btn-prev');
+        const btnNext = document.getElementById('btn-next');
+        const btnFinish = document.getElementById('btn-finish');
+
+        // Initialize UI
+        function init() {
+            renderLessonNav();
+            renderCoursesGrid();
+            updateActiveNav();
+        }
+
+        // Toggle Drawer
+        function toggleDrawer() {
+            drawer.classList.toggle('open');
+            overlay.classList.toggle('open');
+        }
+
+        // Navigate between views
+        function navigate(view) {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            
+            currentView = view;
+            
+            if (view === 'home') {
+                document.getElementById('view-home').classList.add('active');
+            } else if (view === 'courses') {
+                document.getElementById('view-courses').classList.add('active');
+            } else if (view.startsWith('lesson_')) {
+                const lessonId = parseInt(view.split('_')[1]);
+                loadLesson(lessonId);
+                document.getElementById('view-lesson').classList.add('active');
+            }
+
+            if (drawer.classList.contains('open')) {
+                toggleDrawer();
+            }
+
+            updateActiveNav();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Update active state in sidebar
+        function updateActiveNav() {
+            navHome.classList.remove('bg-goldAcc/10', 'text-goldAcc', 'border', 'border-goldAcc/30');
+            navCourses.classList.remove('bg-goldAcc/10', 'text-goldAcc', 'border', 'border-goldAcc/30');
+            document.querySelectorAll('.lesson-nav-btn').forEach(btn => {
+                btn.classList.remove('bg-cardBg', 'text-goldAcc', 'border-goldAcc');
+                btn.classList.add('border-transparent');
+            });
+
+            if (currentView === 'home') {
+                navHome.classList.add('bg-goldAcc/10', 'text-goldAcc', 'border', 'border-goldAcc/30');
+            } else if (currentView === 'courses') {
+                navCourses.classList.add('bg-goldAcc/10', 'text-goldAcc', 'border', 'border-goldAcc/30');
+            } else if (currentView.startsWith('lesson_')) {
+                const lessonId = currentView.split('_')[1];
+                const activeBtn = document.getElementById(`nav-lesson-${lessonId}`);
+                if(activeBtn) {
+                    activeBtn.classList.remove('border-transparent', 'text-gray-400');
+                    activeBtn.classList.add('bg-cardBg', 'text-goldAcc', 'border-goldAcc');
+                }
+            }
+        }
+
+        // Render Sidebar Links
+        function renderLessonNav() {
+            let html = '';
+            lessons.forEach(lesson => {
+                const shortTitle = lesson.title.split(': ')[1] || lesson.title;
+                html += `
+                    <button id="nav-lesson-${lesson.id}" onclick="navigate('lesson_${lesson.id}')" class="lesson-nav-btn w-full text-left px-4 py-3 rounded-md text-[0.9rem] leading-snug transition-colors duration-200 border-l-2 border-transparent text-gray-400 hover:bg-cardBg hover:text-goldAcc hover:border-borderCol">
+                        Bab ${lesson.id}: ${shortTitle}
+                    </button>
+                `;
+            });
+            lessonNavContainer.innerHTML = html;
+        }
+
+        // Render Courses Grid (Overview Page)
+        function renderCoursesGrid() {
+            let html = '';
+            lessons.forEach(lesson => {
+                const titleParts = lesson.title.split(': ');
+                const mainTitle = titleParts[1] ? titleParts[1] : lesson.title;
+                
+                html += `
+                    <div onclick="navigate('lesson_${lesson.id}')" class="group bg-cardBg border border-borderCol rounded-lg p-6 hover:border-goldAcc cursor-pointer transition-all duration-300 hover:shadow-[0_0_20px_rgba(197,160,89,0.1)] flex flex-col justify-between relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-16 h-16 bg-goldAcc/5 rounded-bl-full transform translate-x-8 -translate-y-8 group-hover:translate-x-4 group-hover:-translate-y-4 transition-transform duration-500"></div>
+                        <div>
+                            <div class="text-goldAcc font-bold mb-2 text-sm opacity-80 font-heading">
+                                PERTEMUAN ${lesson.id}
+                            </div>
+                            <h3 class="text-lg font-bold text-[#e2d8bd] group-hover:text-goldAcc transition-colors mb-3 leading-tight font-heading">
+                                ${mainTitle}
+                            </h3>
+                            <p class="text-gray-400 text-justify text-sm leading-relaxed mb-4">
+                                ${lesson.summary}
+                            </p>
+                        </div>
+                        <div class="flex justify-end items-center mt-2 border-t border-borderCol/50 pt-4">
+                            <span class="text-xs text-goldAcc mr-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">Baca Modul Lengkap</span>
+                            <i class="fa-solid fa-chevron-right text-gray-500 group-hover:text-goldAcc transition-colors"></i>
+                        </div>
+                    </div>
+                `;
+            });
+            coursesGrid.innerHTML = html;
+        }
+
+        // Load Specific Lesson
+        function loadLesson(id) {
+            const lesson = lessons.find(l => l.id === id);
+            if (!lesson) return;
+
+            lessonBreadcrumb.textContent = `Pertemuan ${lesson.id}`;
+            lessonTitle.textContent = lesson.title;
+            lessonSummary.textContent = `"${lesson.summary}"`;
+            lessonContent.innerHTML = lesson.content;
+
+            if (id > 1) {
+                btnPrev.style.display = 'flex';
+                btnPrev.onclick = () => navigate(`lesson_${id - 1}`);
+            } else {
+                btnPrev.style.display = 'none';
+            }
+
+            if (id < lessons.length) {
+                btnNext.style.display = 'flex';
+                btnFinish.classList.add('hidden');
+                btnNext.onclick = () => navigate(`lesson_${id + 1}`);
+            } else {
+                btnNext.style.display = 'none';
+                btnFinish.classList.remove('hidden');
+                btnFinish.style.display = 'block';
+                btnFinish.onclick = () => navigate('courses');
+            }
+        }
+
+        // Run Initialization on Load
+        window.onload = init;
+    </script>
+</body>
+</html>
