@@ -151,8 +151,15 @@
                 <p class="px-4 text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Materi Pembelajaran</p>
             </div>
             
-            <div class="space-y-1 pb-10" id="lesson-nav-container">
+            <div class="space-y-1 pb-4" id="lesson-nav-container">
                 <!-- Lesson links will be injected here via JS -->
+            </div>
+
+            <!-- Tambahan Sub-bab Kuis di bagian bawah menu materi -->
+            <div class="pt-4 border-t border-borderCol pb-10">
+                <button onclick="navigate('quiz')" class="w-full flex items-center px-4 py-3 rounded-lg text-gray-400 hover:bg-cardBg hover:text-goldAcc transition-all duration-200" id="nav-quiz">
+                    <i class="fa-solid fa-clipboard-question w-6"></i> Ujian Evaluasi (Bab 4-6)
+                </button>
             </div>
         </div>
     </div>
@@ -239,6 +246,57 @@
                     <button id="btn-finish" class="hidden text-sm md:text-base font-bold text-goldAcc hover:text-white transition-colors px-4 py-2 border border-goldAcc/50 rounded hover:bg-goldAcc/10">
                         Selesai
                     </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW: QUIZ EVALUATION -->
+        <section id="view-quiz" class="view-section">
+            <div class="bg-cardBg border border-borderCol rounded-lg p-6 md:p-12 shadow-2xl relative min-h-[500px]">
+                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-red-800 to-transparent opacity-50"></div>
+                
+                <header class="mb-10 text-center border-b border-borderCol pb-6">
+                    <h1 class="text-3xl md:text-4xl font-bold text-goldAcc mb-4 font-heading">Ujian Evaluasi: Bab 4 - 6</h1>
+                    <p class="text-gray-400">Kerjakan ujian ini dengan teliti. Nilai akan langsung keluar setelah selesai.</p>
+                </header>
+
+                <!-- Kunci/Auth State -->
+                <div id="quiz-auth" class="flex flex-col items-center justify-center py-10">
+                    <i class="fa-solid fa-lock text-5xl text-gray-600 mb-6"></i>
+                    <h3 class="text-2xl font-bold mb-3 text-white">Akses Ujian Terkunci</h3>
+                    <p class="text-gray-400 mb-8 text-center max-w-md">Masukkan kode akses dari Professor Poirot untuk memulai ujian. Peringatan: Ujian hanya dapat dikerjakan satu kali saja.</p>
+                    <div class="flex flex-col items-center w-full max-w-xs">
+                        <input type="password" id="quiz-password" placeholder="Kode Akses" class="w-full bg-darkBg border border-borderCol rounded px-4 py-3 text-textCol focus:outline-none focus:border-goldAcc mb-4 text-center tracking-widest text-xl">
+                        <button onclick="checkQuizPassword()" class="w-full bg-goldAcc text-darkBg px-6 py-3 rounded font-bold hover:bg-goldHover transition-colors shadow-lg">Buka Ujian</button>
+                        <p id="quiz-error" class="text-red-500 mt-4 text-sm font-semibold hidden"><i class="fa-solid fa-circle-exclamation mr-1"></i> Kode akses salah!</p>
+                    </div>
+                </div>
+
+                <!-- Konten Kuis -->
+                <div id="quiz-content" class="hidden">
+                    <div id="quiz-questions-container" class="space-y-8 mb-10">
+                        <!-- Soal akan di-generate via JS -->
+                    </div>
+                    
+                    <div class="text-center pt-8 border-t border-borderCol flex flex-col items-center">
+                        <p id="quiz-validation-error" class="text-red-500 mb-4 hidden font-bold"><i class="fa-solid fa-triangle-exclamation mr-2"></i> Harap jawab semua pertanyaan sebelum mengumpulkan kuis!</p>
+                        <button onclick="submitQuiz()" class="bg-goldAcc text-darkBg px-10 py-4 rounded font-bold text-lg tracking-wide hover:bg-goldHover transition-all shadow-[0_4px_15px_rgba(197,160,89,0.3)]">
+                            <i class="fa-solid fa-check-double mr-2"></i> Kumpulkan Jawaban
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Hasil Kuis -->
+                <div id="quiz-result" class="hidden text-center py-12">
+                    <i class="fa-solid fa-ranking-star text-7xl text-goldAcc mb-6 opacity-90"></i>
+                    <h2 class="text-4xl font-bold text-white mb-4 font-heading">Ujian Selesai!</h2>
+                    <p class="text-gray-400 mb-8">Berikut adalah rekapitulasi nilai akhir evaluasi Anda:</p>
+                    <div class="inline-block bg-darkBg border-2 border-goldAcc rounded-full w-40 h-40 flex items-center justify-center mx-auto mb-8 shadow-[0_0_40px_rgba(197,160,89,0.2)]">
+                        <span id="quiz-score-display" class="text-5xl font-bold text-goldAcc font-heading">0/15</span>
+                    </div>
+                    <div class="max-w-lg mx-auto bg-darkBg p-6 rounded border border-borderCol">
+                        <p id="quiz-feedback" class="text-lg italic text-textCol leading-relaxed"></p>
+                    </div>
                 </div>
             </div>
         </section>
@@ -436,7 +494,30 @@
             }
         ];
 
+        // QUIZ DATA
+        const quizQuestions = [
+            { q: "Hama taman dengan kepala berproporsi terlalu besar seperti kentang berbatu adalah...", options: ["Imp", "Gnome", "Doxy", "Bowtruckle"], a: 1 },
+            { q: "Prosedur standar yang diakui dan efisien untuk mengusir Gnome dari taman disebut dengan Gnoming. Apa tahap awal dari prosedur tersebut?", options: ["Membius mereka dengan Stupefy", "Menyemprotkan Doxycide ke liangnya", "Menangkap kakinya dan memutarnya secara melingkar", "Menawarkan kutu kayu sebagai umpan"], a: 2 },
+            { q: "Doxy sering kali salah diidentifikasi oleh mata awam sebagai...", options: ["Fairy (Peri)", "Pixie", "Imp", "Bowtruckle"], a: 0 },
+            { q: "Apa ancaman paling serius dari gigitan Doxy yang membedakannya dari serangga magis lainnya, terutama pada korban anak-anak?", options: ["Kehilangan orientasi arah", "Dapat memicu syok anafilaksis akibat venom berkecepatan tinggi", "Merusak jaringan kulit hingga membusuk permanen", "Mengubah korban menjadi kanibal sementara"], a: 1 },
+            { q: "Alih-alih mantra pertempuran, metode terbaik untuk membasmi Doxy yang bersarang dalam jumlah besar adalah...", options: ["Verdimillious", "Membakar dengan Lumos Solem", "Mantra Flipendo Maxima", "Racun semprot biokimia (Doxycide)"], a: 3 },
+            { q: "Mengapa mantra Stupefy (Pembius) tidak berguna saat menghadapi sebuah Gargoyle?", options: ["Gargoyle kebal terhadap semua jenis sihir", "Gargoyle mampu memantulkan mantra dengan perisai cermin", "Gargoyle terbuat dari benda padat murni (granit/kapur) yang tidak memiliki sistem saraf biologis", "Gargoyle bergerak terlalu cepat untuk dibidik"], a: 2 },
+            { q: "Mantra apa yang direkomendasikan untuk melumpuhkan pergerakan Gargoyle dengan cara merusak artikulasi persendiannya?", options: ["Reducto (Mantra Penghancur)", "Immobulus", "Langlock", "Aqua Eructo"], a: 0 },
+            { q: "Alasan utama Hag diklasifikasikan dengan tingkat bahaya tinggi (XXX) adalah karena sifat alami mereka yang...", options: ["Dapat menyamar secara sempurna di dalam kota Muggles", "Cenderung melakukan diet kanibalisme pada daging manusia", "Memiliki racun mematikan dari kuku mereka", "Tahan terhadap kutukan tak terampuni"], a: 1 },
+            { q: "Taktik bertahan hidup apa yang diinstruksikan oleh Professor Poirot saat berhadapan dengan Hag?", options: ["Mendekat untuk pertarungan jarak dekat (duel)", "Bernegosiasi menggunakan penyuapan makanan", "Menggunakan jinx pengganggu ringan untuk mengusirnya", "Menjaga jarak minimal 15 meter dan menggunakan pendorong berdaya ledak"], a: 3 },
+            { q: "Secara molekuler, Hantu (Ghost) adalah...", options: ["Manifestasi emosi kekacauan yang hidup", "Makhluk gaib yang tercipta dari kegelapan", "Cetakan ektoplasmik (imprint) dari jiwa penyihir yang tidak bisa pergi ke alam selanjutnya", "Sihir ilusi yang tak sengaja berumur panjang"], a: 2 },
+            { q: "Peeves di kastil Hogwarts tidak pernah menjadi manusia sebelumnya. Dia adalah wujud entitas yang disebut...", options: ["Gytrash", "Poltergeist", "Boggart", "Hantu Transparan"], a: 1 },
+            { q: "Jika seorang Poltergeist merapal mantra gangguan atau berteriak untuk menciptakan kekacauan, mantra terbaik untuk menghentikannya seketika adalah...", options: ["Langlock", "Waddiwasi", "Flipendo", "Nox"], a: 0 },
+            { q: "Gytrash sering kali bermanifestasi dan berkeliaran di malam hari dalam wujud fisik menyerupai...", options: ["Ular derik dengan racun bayangan", "Anjing spektral besar, kuda, atau serigala", "Bayangan hitam dengan sayap kelelawar raksasa", "Kumpulan asap tebal yang menyerupai Manusia"], a: 1 },
+            { q: "Taktik mematikan apa yang digunakan Gytrash untuk berburu mangsanya di jalanan sunyi?", options: ["Melemparkan batu secara telekinetik dari jauh", "Berkamuflase di balik pepohonan untuk menyergap secara langsung", "Bersikap sebagai pemandu yang menuntun pelancong masuk ke dalam jurang atau rawa", "Membuat korbannya tertidur secara tiba-tiba menggunakan sihir hipnotis"], a: 2 },
+            { q: "Satu-satunya pertahanan mutlak yang dapat mengurai kembali molekul bayangan dari Gytrash adalah...", options: ["Foton intensitas tinggi menggunakan Lumos Solem atau Verdimillious", "Melarikan diri karena Gytrash tidak bisa dilukai", "Mantra pembius berturut-turut pada wujud ektoplasmiknya", "Perisai api magis (Protego Diabolica)"], a: 0 }
+        ];
+
         let currentView = 'home';
+        
+        // Quiz State variables
+        let hasTakenQuiz = false;
+        let quizScore = 0;
 
         // DOM Elements
         const drawer = document.getElementById('sidebar-drawer');
@@ -447,6 +528,7 @@
         // Navigation Buttons
         const navHome = document.getElementById('nav-home');
         const navCourses = document.getElementById('nav-courses');
+        const navQuiz = document.getElementById('nav-quiz');
 
         // Lesson View Elements
         const lessonBreadcrumb = document.getElementById('lesson-breadcrumb');
@@ -480,6 +562,8 @@
                 document.getElementById('view-home').classList.add('active');
             } else if (view === 'courses') {
                 document.getElementById('view-courses').classList.add('active');
+            } else if (view === 'quiz') {
+                document.getElementById('view-quiz').classList.add('active');
             } else if (view.startsWith('lesson_')) {
                 const lessonId = parseInt(view.split('_')[1]);
                 loadLesson(lessonId);
@@ -498,6 +582,8 @@
         function updateActiveNav() {
             navHome.classList.remove('bg-goldAcc/10', 'text-goldAcc', 'border', 'border-goldAcc/30');
             navCourses.classList.remove('bg-goldAcc/10', 'text-goldAcc', 'border', 'border-goldAcc/30');
+            navQuiz.classList.remove('bg-goldAcc/10', 'text-goldAcc', 'border', 'border-goldAcc/30');
+            
             document.querySelectorAll('.lesson-nav-btn').forEach(btn => {
                 btn.classList.remove('bg-cardBg', 'text-goldAcc', 'border-goldAcc');
                 btn.classList.add('border-transparent');
@@ -507,6 +593,8 @@
                 navHome.classList.add('bg-goldAcc/10', 'text-goldAcc', 'border', 'border-goldAcc/30');
             } else if (currentView === 'courses') {
                 navCourses.classList.add('bg-goldAcc/10', 'text-goldAcc', 'border', 'border-goldAcc/30');
+            } else if (currentView === 'quiz') {
+                navQuiz.classList.add('bg-goldAcc/10', 'text-goldAcc', 'border', 'border-goldAcc/30');
             } else if (currentView.startsWith('lesson_')) {
                 const lessonId = currentView.split('_')[1];
                 const activeBtn = document.getElementById(`nav-lesson-${lessonId}`);
@@ -589,6 +677,101 @@
                 btnFinish.style.display = 'block';
                 btnFinish.onclick = () => navigate('courses');
             }
+        }
+
+        // --- QUIZ LOGIC FUNCTIONS --- //
+        
+        function checkQuizPassword() {
+            const pwdInput = document.getElementById('quiz-password');
+            const errorMsg = document.getElementById('quiz-error');
+            
+            if (pwdInput.value === '14140') {
+                errorMsg.classList.add('hidden');
+                document.getElementById('quiz-auth').classList.add('hidden');
+                
+                // Jika sudah pernah ikut, langsung ke result
+                if (hasTakenQuiz) {
+                    document.getElementById('quiz-result').classList.remove('hidden');
+                } else {
+                    document.getElementById('quiz-content').classList.remove('hidden');
+                    renderQuiz();
+                }
+            } else {
+                errorMsg.classList.remove('hidden');
+                pwdInput.value = ''; // Reset input on wrong password
+            }
+        }
+
+        function renderQuiz() {
+            const container = document.getElementById('quiz-questions-container');
+            let html = '';
+            
+            quizQuestions.forEach((item, index) => {
+                html += `
+                    <div class="bg-darkBg p-6 rounded-lg border border-borderCol/60 hover:border-borderCol transition-colors">
+                        <p class="font-bold text-white mb-4 leading-relaxed"><span class="text-goldAcc mr-2">Soal ${index + 1}.</span> ${item.q}</p>
+                        <div class="space-y-3 pl-4 sm:pl-8">
+                `;
+                
+                item.options.forEach((opt, optIdx) => {
+                    html += `
+                        <label class="flex items-start cursor-pointer group">
+                            <input type="radio" name="q${index}" value="${optIdx}" class="mt-1 mr-3 accent-goldAcc cursor-pointer flex-shrink-0">
+                            <span class="text-gray-400 group-hover:text-goldAcc transition-colors text-sm sm:text-base">${opt}</span>
+                        </label>
+                    `;
+                });
+                
+                html += `</div></div>`;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        function submitQuiz() {
+            if (hasTakenQuiz) return;
+            
+            let score = 0;
+            let allAnswered = true;
+            
+            quizQuestions.forEach((item, index) => {
+                const selected = document.querySelector(`input[name="q${index}"]:checked`);
+                if (!selected) {
+                    allAnswered = false;
+                } else if (parseInt(selected.value) === item.a) {
+                    score++;
+                }
+            });
+            
+            const validationError = document.getElementById('quiz-validation-error');
+            if (!allAnswered) {
+                validationError.classList.remove('hidden');
+                return;
+            } else {
+                validationError.classList.add('hidden');
+            }
+            
+            // Set state to completed
+            quizScore = score;
+            hasTakenQuiz = true;
+            
+            // Toggle Display
+            document.getElementById('quiz-content').classList.add('hidden');
+            document.getElementById('quiz-result').classList.remove('hidden');
+            document.getElementById('quiz-score-display').textContent = `${score}/15`;
+            
+            // Generate Feedback
+            const feedback = document.getElementById('quiz-feedback');
+            if (score === 15) {
+                feedback.innerHTML = '<span class="text-green-500 font-bold block mb-2">Luar Biasa!</span> "Sempurna! Sel-sel kelabu Anda bekerja dengan performa maksimal. Anda telah menguasai analisis taktis ini."';
+            } else if (score >= 10) {
+                feedback.innerHTML = '<span class="text-yellow-500 font-bold block mb-2">Cukup Baik</span> "Hasil yang baik, namun kelalaian kecil bisa berakibat fatal di lapangan. Tetap asah analisis Anda."';
+            } else {
+                feedback.innerHTML = '<span class="text-red-500 font-bold block mb-2">Sangat Kurang</span> "Sangat mengecewakan. Anda tidak akan bertahan lama di lapangan. Silakan baca kembali bab-bab sebelumnya dengan lebih teliti."';
+            }
+            
+            // Scroll otomatis ke hasil kuis
+            window.scrollTo({ top: document.getElementById('view-quiz').offsetTop - 20, behavior: 'smooth' });
         }
 
         // Run Initialization on Load
