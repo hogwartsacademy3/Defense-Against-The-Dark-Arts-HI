@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Buku D.A.D.A - Tahun ke-3</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -32,6 +32,12 @@
         }
     </script>
     <style>
+        html, body {
+            overflow-x: hidden;
+            width: 100%;
+            position: relative;
+        }
+        
         body {
             background-color: #121418;
             color: #d4cbb3;
@@ -73,14 +79,15 @@
         }
         .view-section {
             display: none;
-            animation: fadeIn 0.4s ease-out forwards;
+            /* Jangan biarkan transform statis agar fixed pop-up tidak terperangkap */
         }
         .view-section.active {
             display: block;
+            animation: fadeIn 0.4s ease-out forwards;
         }
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+            to { opacity: 1; transform: none; } /* Gunakan 'none' agar pop-up aman */
         }
         p {
             text-align: justify;
@@ -95,12 +102,488 @@
             margin: 1.5rem 0;
             font-style: italic;
         }
+
+        /* --- MIDNIGHT DINNER CASE STYLES --- */
+        #midnight-dinner-app, #md-fixed-ui {
+            --bg-color: #0a0a0c;
+            --surface-color: #16161a;
+            --surface-light: #24242b;
+            --text-main: #e4e4e7;
+            --text-muted: #a1a1aa;
+            --accent-red: #991b1b;
+            --accent-red-hover: #b91c1c;
+            --border-color: #333338;
+            --font-ui: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            --font-serif: "Georgia", "Merriweather", "Times New Roman", serif;
+
+            color: var(--text-main);
+            font-family: var(--font-ui);
+            line-height: 1.6;
+            font-size: 16px;
+        }
+
+        #midnight-dinner-app {
+            background-color: var(--bg-color);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            -webkit-tap-highlight-color: transparent;
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+
+        #md-fixed-ui { display: contents; } /* Container dummy agar CSS vars tembus */
+
+        #midnight-dinner-app p, #md-fixed-ui p {
+            font-family: var(--font-ui);
+            text-align: left;
+            margin-bottom: 0;
+            font-size: 16px;
+        }
+
+        #midnight-dinner-app h1, #midnight-dinner-app h2, #midnight-dinner-app h3, #midnight-dinner-app h4,
+        #md-fixed-ui h1, #md-fixed-ui h2, #md-fixed-ui h3, #md-fixed-ui h4 {
+            font-family: var(--font-ui);
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            color: #fff;
+            margin: 0;
+        }
+
+        #midnight-dinner-app select, #midnight-dinner-app textarea,
+        #md-fixed-ui select, #md-fixed-ui textarea {
+            font-family: var(--font-ui);
+        }
+
+        .narrative {
+            font-family: var(--font-serif) !important;
+            text-align: justify !important;
+            line-height: 1.8;
+            font-size: 1.05rem !important;
+            margin-bottom: 1.5rem !important;
+            color: #d4d4d8;
+        }
+        .narrative p {
+            font-family: var(--font-serif) !important;
+            margin-bottom: 1.5rem !important;
+        }
+
+        .text-center { text-align: center; }
+        .text-accent { color: var(--accent-red); }
+        .text-muted { color: var(--text-muted); font-size: 0.9rem !important; }
+        .font-bold { font-weight: bold; }
+
+        .app-container {
+            max-width: 100%;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .md-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            background-color: rgba(10, 10, 12, 0.95);
+            border-bottom: 1px solid var(--border-color);
+            position: relative; 
+            z-index: 10;
+        }
+
+        .header-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .content-area {
+            flex: 1;
+            padding: 2rem 1.5rem;
+            padding-bottom: 5rem;
+            animation: fadeIn 0.4s ease;
+            box-sizing: border-box;
+            max-width: 100%;
+        }
+
+        .menu-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            width: 30px;
+            height: 24px;
+            position: relative;
+            z-index: 12;
+            padding: 0;
+        }
+
+        .menu-btn span {
+            display: block;
+            width: 100%;
+            height: 2px;
+            background-color: var(--text-main);
+            position: absolute;
+            transition: all 0.3s ease;
+        }
+
+        .menu-btn span:nth-child(1) { top: 0; }
+        .menu-btn span:nth-child(2) { top: 11px; }
+        .menu-btn span:nth-child(3) { top: 22px; }
+
+        .menu-btn.active span:nth-child(1) { top: 11px; transform: rotate(45deg); }
+        .menu-btn.active span:nth-child(2) { opacity: 0; }
+        .menu-btn.active span:nth-child(3) { top: 11px; transform: rotate(-45deg); }
+
+        .md-nav-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 150;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .md-nav-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .nav-menu {
+            position: fixed;
+            top: 0;
+            right: -300px;
+            width: 280px;
+            max-width: 80%;
+            height: 100%;
+            background-color: var(--surface-color);
+            border-left: 1px solid var(--border-color);
+            z-index: 200;
+            padding: 5rem 1.5rem 2rem;
+            transition: transform 0.3s ease;
+            overflow-y: auto;
+        }
+
+        .nav-menu.active {
+            transform: translateX(-300px);
+        }
+
+        .nav-link {
+            display: block;
+            padding: 1rem 0;
+            color: var(--text-main);
+            text-decoration: none;
+            font-size: 1.1rem;
+            border-bottom: 1px solid var(--border-color);
+            transition: color 0.2s;
+        }
+        
+        .nav-link:last-child { border-bottom: none; }
+        .nav-link:hover, .nav-link.active-link { color: var(--accent-red); }
+
+        .md-card {
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            transition: transform 0.2s, box-shadow 0.2s;
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+
+        .card-clickable {
+            cursor: pointer;
+        }
+
+        .card-clickable:hover {
+            transform: translateY(-2px);
+            border-color: var(--accent-red);
+            box-shadow: 0 6px 12px rgba(153, 27, 27, 0.1);
+        }
+
+        .md-btn {
+            display: inline-block;
+            background-color: transparent;
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            padding: 0.8rem 1.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            text-align: center;
+            transition: all 0.2s;
+            width: 100%;
+            margin-top: 1rem;
+            box-sizing: border-box;
+        }
+
+        .md-btn-primary {
+            background-color: var(--accent-red);
+            border-color: var(--accent-red);
+            color: #fff;
+        }
+
+        .md-btn-secondary {
+            background-color: var(--surface-light);
+            border-color: var(--border-color);
+            color: #fff;
+        }
+
+        .md-btn:hover {
+            background-color: var(--surface-light);
+            border-color: var(--text-muted);
+        }
+        
+        .md-btn-primary:hover {
+            background-color: var(--accent-red-hover);
+            border-color: var(--accent-red-hover);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.2rem 0.6rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            background-color: var(--surface-light);
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .location-grid, .suspect-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+            max-width: 100%;
+        }
+
+        @media (min-width: 600px) {
+            .location-grid, .suspect-grid { grid-template-columns: 1fr 1fr; }
+        }
+
+        .statement-list {
+            list-style: none;
+            margin-top: 1rem;
+            padding-left: 0;
+        }
+
+        .statement-item {
+            background-color: var(--surface-light);
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 0.8rem;
+            border-left: 3px solid var(--border-color);
+        }
+
+        .statement-item p { margin-bottom: 0.8rem !important; font-style: italic; }
+
+        .btn-bantah {
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+            margin-top: 0;
+            width: auto;
+            border-color: var(--accent-red);
+            color: var(--accent-red);
+        }
+        .btn-bantah:hover { background-color: var(--accent-red); color: #fff; }
+
+        .timeline-container {
+            border-left: 2px solid var(--border-color);
+            padding-left: 1.5rem;
+            margin-left: 1rem;
+        }
+
+        .timeline-event {
+            position: relative;
+            margin-bottom: 2rem;
+        }
+
+        .timeline-event::before {
+            content: '';
+            position: absolute;
+            left: -1.85rem;
+            top: 0.3rem;
+            width: 12px;
+            height: 12px;
+            background-color: var(--accent-red);
+            border-radius: 50%;
+        }
+        
+        .timeline-time {
+            font-weight: bold;
+            color: var(--accent-red);
+            margin-bottom: 0.3rem;
+        }
+
+        #midnight-dinner-app textarea, #md-fixed-ui textarea {
+            width: 100%;
+            height: 300px;
+            background-color: var(--surface-light);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 1rem;
+            border-radius: 6px;
+            resize: vertical;
+            box-sizing: border-box;
+        }
+
+        #midnight-dinner-app select, #md-fixed-ui select {
+            width: 100%;
+            background-color: var(--surface-light);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            padding: 0.8rem;
+            border-radius: 4px;
+            margin-bottom: 1.5rem;
+            font-size: 1rem;
+            outline: none;
+            appearance: none;
+            box-sizing: border-box;
+        }
+        
+        .md-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            z-index: 300;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+            padding: 1rem;
+            box-sizing: border-box;
+        }
+        
+        .md-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 2rem;
+            position: relative;
+            transform: scale(0.95);
+            transition: transform 0.3s;
+            box-sizing: border-box;
+        }
+
+        .md-modal.active .modal-content {
+            transform: scale(1);
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 1rem;
+            right: 1.5rem;
+            font-size: 1.5rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+
+        .md-notification {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background-color: var(--surface-light);
+            border-left: 4px solid var(--accent-red);
+            padding: 1rem 2rem;
+            border-radius: 4px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            z-index: 310;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            width: 90%;
+            max-width: 400px;
+            box-sizing: border-box;
+            pointer-events: none; /* Ignore clicks saat tidak aktif */
+        }
+
+        .md-notification.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+        }
+
+        .evidence-icon {
+            font-size: 1.5rem;
+        }
+
+        .report-card {
+            background-color: #f4f4f5;
+            color: #18181b;
+            padding: 2rem;
+            border-radius: 8px;
+            font-family: "Courier New", Courier, monospace;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            margin-top: 1rem;
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+        
+        .report-header {
+            text-align: center;
+            border-bottom: 3px solid #18181b;
+            padding-bottom: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stamp {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border: 4px solid;
+            font-weight: bold;
+            font-size: 1.8rem;
+            transform: rotate(-5deg);
+            margin: 1rem 0;
+            letter-spacing: 2px;
+        }
+        .stamp.solved { color: #15803d; border-color: #15803d; }
+        .stamp.failed { color: #b91c1c; border-color: #b91c1c; }
+
+        .ending-tag {
+            display: inline-block;
+            background-color: #18181b;
+            color: #fff;
+            padding: 0.3rem 0.8rem;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            font-family: var(--font-ui);
+        }
     </style>
 </head>
 <body class="flex flex-col min-h-screen selection:bg-goldAcc selection:text-white">
 
     <!-- Top Navigation -->
-    <nav class="sticky top-0 z-30 bg-[#0d0f12] border-b border-borderCol shadow-lg">
+    <nav class="sticky top-0 z-30 bg-[#0d0f12] border-b border-borderCol shadow-lg w-full">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 <div class="flex items-center">
@@ -160,12 +643,17 @@
                 <button onclick="navigate('quiz')" class="w-full flex items-center px-4 py-3 rounded-lg text-gray-400 hover:bg-cardBg hover:text-goldAcc transition-all duration-200" id="nav-quiz">
                     <i class="fa-solid fa-clipboard-question w-6"></i> Ujian Evaluasi (Bab 4-6)
                 </button>
+                
+                <!-- NEW BUTTON FOR MIDNIGHT DINNER -->
+                <button onclick="navigate('case-file')" class="w-full flex items-center px-4 py-3 rounded-lg text-gray-400 hover:bg-cardBg hover:text-goldAcc transition-all duration-200 mt-2" id="nav-case-file-btn">
+                    <i class="fa-solid fa-user-secret w-6"></i> Kasus: Midnight Dinner
+                </button>
             </div>
         </div>
     </div>
 
     <!-- Main Content -->
-    <main class="flex-grow w-full max-w-4xl mx-auto px-5 sm:px-8 py-10 lg:py-16 relative">
+    <main class="flex-grow w-full max-w-4xl mx-auto px-4 sm:px-8 py-10 lg:py-16 relative overflow-x-hidden">
         
         <!-- VIEW: HOME -->
         <section id="view-home" class="view-section active">
@@ -175,7 +663,7 @@
                 <h2 class="text-xl md:text-2xl text-gray-400 mb-8 italic">Tahun Ketiga</h2>
             </div>
             
-            <div class="bg-cardBg border border-borderCol rounded-lg p-8 md:p-10 shadow-xl relative overflow-hidden">
+            <div class="bg-cardBg border border-borderCol rounded-lg p-6 md:p-10 shadow-xl relative overflow-hidden">
                 <div class="absolute top-0 left-0 w-1.5 h-full bg-gradient-to-b from-goldAcc to-[#8c703b]"></div>
                 <h3 class="text-2xl font-bold mb-6 text-goldAcc border-b border-borderCol pb-4 font-heading">Pengantar Kelas oleh Professor Poirot</h3>
                 
@@ -301,10 +789,86 @@
             </div>
         </section>
 
+        <!-- VIEW: MIDNIGHT DINNER CASE FILE -->
+        <section id="view-case-file" class="view-section">
+            <!-- App Container untuk Case File diletakkan di dalam sini agar halamannya muncul -->
+            <div id="midnight-dinner-app">
+                <div class="app-container">
+                    <header class="md-header" id="mainHeader">
+                        <div class="header-title">THE MIDNIGHT DINNER</div>
+                        <button class="menu-btn" id="menuBtn" aria-label="Menu">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </button>
+                    </header>
+                    <main class="content-area" id="contentArea">
+                        <!-- Konten Halaman Midnight Dinner akan dimuat di sini -->
+                    </main>
+                </div>
+            </div>
+        </section>
+
     </main>
 
+    <!-- FIXED UI UNTUK MIDNIGHT DINNER (Diletakkan di luar struktur main untuk mencegah pop-up terkunci ke bawah konten) -->
+    <div id="md-fixed-ui">
+        <div class="md-nav-overlay" id="navOverlay"></div>
+        <nav class="nav-menu" id="navMenu">
+            <a href="#" class="nav-link" data-target="home">Beranda</a>
+            <a href="#" class="nav-link" data-target="locations">Lokasi (Eksplorasi)</a>
+            <a href="#" class="nav-link" data-target="suspects">Tersangka</a>
+            <a href="#" class="nav-link" data-target="evidence">Daftar Bukti</a>
+            <a href="#" class="nav-link" data-target="timeline">Linimasa</a>
+            <a href="#" class="nav-link" data-target="notes">Buku Catatan</a>
+            <a href="#" class="nav-link" data-target="deduction">Papan Deduksi</a>
+            <a href="#" class="nav-link" data-target="accusation" style="color: var(--accent-red); font-weight: bold; margin-top: 2rem;">Buat Tuduhan Akhir</a>
+        </nav>
+
+        <!-- Modal Bukti (Bantah Pernyataan) -->
+        <div class="md-modal" id="contradictionModal">
+            <div class="modal-content">
+                <button class="close-modal" id="closeModal">&times;</button>
+                <h3 style="margin-bottom: 1rem; color: var(--accent-red);">Bantah Pernyataan</h3>
+                <p class="text-muted" style="margin-bottom: 1.5rem;">Pilih bukti yang kontradiksi dengan pernyataan ini:</p>
+                <div style="background: var(--surface-light); padding: 1rem; border-left: 3px solid #666; font-style: italic; margin-bottom: 1.5rem;" id="modalStatementText">
+                    "..."
+                </div>
+                
+                <select id="evidenceSelect" style="margin-bottom: 1rem;">
+                    <!-- Pilihan Bukti Dinamis -->
+                </select>
+                
+                <button class="md-btn md-btn-primary" id="btnSubmitContradiction" onclick="handleContradictionSubmit()">Ajukan Bukti</button>
+                
+                <div id="contradictionFeedback" style="margin-top: 1rem; font-weight: bold; display: none; padding: 1rem; border-radius: 4px;">
+                </div>
+            </div>
+        </div>
+
+        <!-- Custom System Modal (Pengganti alert & confirm) -->
+        <div class="md-modal" id="sysModal">
+            <div class="modal-content" style="max-width: 400px; text-align: center;">
+                <h3 id="sysModalTitle" style="margin-bottom: 1rem; color: #fff;"></h3>
+                <p id="sysModalText" style="margin-bottom: 1.5rem; color: var(--text-muted); font-size: 1rem;"></p>
+                <div id="sysModalButtons" style="display: flex; gap: 1rem; justify-content: center;">
+                    <!-- Tombol akan disuntikkan dari JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Notifikasi Toast -->
+        <div class="md-notification" id="notification">
+            <div class="evidence-icon">🔎</div>
+            <div>
+                <div style="font-size: 0.8rem; color: var(--text-muted);">Bukti Baru Ditemukan</div>
+                <div id="notificationText" style="font-weight: bold; color: white;">Nama Bukti</div>
+            </div>
+        </div>
+    </div>
+
     <!-- Footer -->
-    <footer class="bg-[#0d0f12] border-t border-borderCol py-8 text-center text-gray-500 text-sm mt-auto">
+    <footer class="bg-[#0d0f12] border-t border-borderCol py-8 text-center text-gray-500 text-sm mt-auto w-full">
         <p class="mb-2 tracking-widest font-heading font-bold text-gray-400">DEFENSE AGAINST THE DARK ARTS</p>
         <p>Curriculum Grade 3 — Professor Hercule Poirot</p>
     </footer>
@@ -341,7 +905,7 @@
 
                     <p><strong>2. Hex (Mantra Penderitaan Moderat):</strong> Hex membawa niat yang jauh lebih memusuhi. Efeknya secara aktif dirancang untuk merugikan, memberi penderitaan fisik sedang, atau merusak fungsi organ tubuh sementara waktu. Mantra seperti <em>Bat-Bogey Hex</em> atau <em>Densaugeo</em> masuk dalam kategori ini. Berhadapan dengan Hex membutuhkan pertahanan perisai aktif (seperti <em>Protego</em>) karena efeknya dapat melumpuhkan daya juang Anda di tengah pertempuran.</p>
 
-                    <p><strong>3. Curse / Kutukan (Sihir Hitam Murni):</strong> Ini adalah pเวก puncak dari sihir gelap. Kutukan digerakkan oleh niat murni untuk menghancurkan, mengendalikan, atau menimbulkan penderitaan yang tak terbayangkan. Kutukan mengubah sifat alami objek atau tubuh korban secara permanen jika tidak ditangani oleh Ahli Penyembuh (Healer). Tiga Kutukan Tak Terampuni (Unforgivable Curses) berada di puncak kategori ini. Karakteristik utama Kutukan adalah resistensinya yang tinggi terhadap mantra pembalik standar.</p>
+                    <p><strong>3. Curse / Kutukan (Sihir Hitam Murni):</strong> Ini adalah puncak dari sihir gelap. Kutukan digerakkan oleh niat murni untuk menghancurkan, mengendalikan, atau menimbulkan penderitaan yang tak terbayangkan. Kutukan mengubah sifat alami objek atau tubuh korban secara permanen jika tidak ditangani oleh Ahli Penyembuh (Healer). Tiga Kutukan Tak Terampuni (Unforgivable Curses) berada di puncak kategori ini. Karakteristik utama Kutukan adalah resistensinya yang tinggi terhadap mantra pembalik standar.</p>
 
                     <div class="lesson-highlight">
                         "Tubuh manusia adalah wadah bagi energi magis. Menguras wadah tersebut tanpa perhitungan adalah bentuk kegagalan analisis paling konyol dari seorang penyihir."
@@ -483,7 +1047,7 @@
 
                     <p>Hampir seluruh permukaan atas dan samping Skrewt ditutupi armor cangkang yang memantulkan kembali sebagian besar jinx, pembius (<em>Stupefy</em>), dan kutukan biasa. Menembakkan mantra ke arah cangkangnya berisiko memantulkan sihir tersebut kembali mengenai diri Anda sendiri.</p>
 
-                    <p>Satu-satunya <strong>titik lemah anatomis (vulnerable point)</strong> dari Blast-Ended Skrewt adalah bagian bawah perutnya (underside), yang tidak terlindungi oleh armor keras dan berkulit lunak. Oleh karena itu, taktik pertempuran melawannya menuntut eksekusi dua langkah yang presisi:</p>
+                    <p>Satu-satunya <strong>titik lemah anatomis (vulnerable point)</strong> dari Blast-Ended Skrewt adalah bagian bawah perutnya (underside), yang tidak terlindungi oleh armor keras dan berkulit lunak. Oleh Karena itu, taktik pertempuran melawannya menuntut eksekusi dua langkah yang presisi:</p>
 
                     <p>1. <strong>Langkah 1 (Evasi Taktis):</strong> Saat Skrewt bersiap meluncurkan dirinya menggunakan ledakan belakangnya, jangan mencoba menahannya. Lakukan manuver menghindar ke samping secara cepat untuk membuat Skrewt meluncur melewati Anda.</p>
 
@@ -564,6 +1128,8 @@
                 document.getElementById('view-courses').classList.add('active');
             } else if (view === 'quiz') {
                 document.getElementById('view-quiz').classList.add('active');
+            } else if (view === 'case-file') {
+                document.getElementById('view-case-file').classList.add('active');
             } else if (view.startsWith('lesson_')) {
                 const lessonId = parseInt(view.split('_')[1]);
                 loadLesson(lessonId);
@@ -584,6 +1150,9 @@
             navCourses.classList.remove('bg-goldAcc/10', 'text-goldAcc', 'border', 'border-goldAcc/30');
             navQuiz.classList.remove('bg-goldAcc/10', 'text-goldAcc', 'border', 'border-goldAcc/30');
             
+            const navCaseFile = document.getElementById('nav-case-file-btn');
+            if (navCaseFile) navCaseFile.classList.remove('bg-goldAcc/10', 'text-goldAcc', 'border', 'border-goldAcc/30');
+            
             document.querySelectorAll('.lesson-nav-btn').forEach(btn => {
                 btn.classList.remove('bg-cardBg', 'text-goldAcc', 'border-goldAcc');
                 btn.classList.add('border-transparent');
@@ -595,6 +1164,8 @@
                 navCourses.classList.add('bg-goldAcc/10', 'text-goldAcc', 'border', 'border-goldAcc/30');
             } else if (currentView === 'quiz') {
                 navQuiz.classList.add('bg-goldAcc/10', 'text-goldAcc', 'border', 'border-goldAcc/30');
+            } else if (currentView === 'case-file') {
+                if (navCaseFile) navCaseFile.classList.add('bg-goldAcc/10', 'text-goldAcc', 'border', 'border-goldAcc/30');
             } else if (currentView.startsWith('lesson_')) {
                 const lessonId = currentView.split('_')[1];
                 const activeBtn = document.getElementById(`nav-lesson-${lessonId}`);
@@ -774,8 +1345,641 @@
             window.scrollTo({ top: document.getElementById('view-quiz').offsetTop - 20, behavior: 'smooth' });
         }
 
-        // Run Initialization on Load
-        window.onload = init;
+
+        // ========================================== //
+        // --- CASE FILE: THE MIDNIGHT DINNER JS --- //
+        // ========================================== //
+        
+        const md_db = {
+            locations: [
+                {
+                    id: 'study', name: 'Ruang Kerja Adrian (TKP)',
+                    desc: 'Ruangan ini terkunci dari dalam. Jendela tertutup rapat. Bau samar almond pahit mengambang di udara. Tubuh Adrian terbaring kaku di kursi kerjanya.',
+                    searched: false, evidenceToFind: ['body', 'capsule', 'door', 'medical_record']
+                },
+                {
+                    id: 'living_room', name: 'Ruang Tamu',
+                    desc: 'Ruangan yang luas dengan TV kabel besar dan sofa kulit. Puntung rokok Eleanor ada di asbak.',
+                    searched: false, evidenceToFind: ['whiskey', 'tv_log']
+                },
+                {
+                    id: 'music_room', name: 'Ruang Musik',
+                    desc: 'Koleksi piringan hitam dan alat musik antik milik Adrian. Suasananya pengap dan sepi.',
+                    searched: false, evidenceToFind: ['gramophone', 'cyanide_vial', 'vinyl']
+                },
+                {
+                    id: 'garden', name: 'Taman Belakang',
+                    desc: 'Taman yang gelap. Hujan baru saja reda, menyisakan tanah yang becek. Di sudut terdapat panel kotak sekring rumah.',
+                    searched: false, evidenceToFind: ['breaker_box', 'footprints']
+                },
+                {
+                    id: 'library', name: 'Perpustakaan',
+                    desc: 'Tempat Clara bekerja menyusun dokumen. Beberapa laci tampak tidak terkunci.',
+                    searched: false, evidenceToFind: ['divorce_papers', 'financial_report']
+                },
+                {
+                    id: 'kitchen', name: 'Dapur Utama',
+                    desc: 'Dapur bersih dan rapi. Sebuah teko air panas masih mengeluarkan sedikit uap.',
+                    searched: false, evidenceToFind: ['tea_flask', 'syringe']
+                }
+            ],
+            
+            evidence: {
+                body: { name: 'Mayat Adrian Vale', desc: 'Tidak ada luka luar atau tanda pencekikan. Bau khas almond pahit sangat samar tercium dari mulutnya. Kematian diperkirakan terjadi sangat cepat.' },
+                capsule: { name: 'Kapsul Obat (Kosong)', desc: 'Cangkang kapsul obat jantung di atas meja kerja Adrian. Terdapat residu bubuk putih di dalamnya yang bereaksi positif terhadap Sianida mematikan.' },
+                door: { name: 'Pintu Ruang Kerja (Terkunci)', desc: 'Pintu ini dikunci dari dalam menggunakan gerendel geser berbahan baja. Tidak mungkin menguncinya dari luar tanpa merusak pintu.' },
+                medical_record: { name: 'Catatan Medis Adrian', desc: 'Jadwal minum obat: Kapsul Jantung rutin diminum SATU KALI sehari, TEPAT pada pukul 22:30.' },
+                whiskey: { name: 'Gelas Wiski', desc: 'Gelas berisi wiski setengah penuh di Ruang Tamu. Tidak ditemukan racun di dalamnya.' },
+                tv_log: { name: 'Log Smart TV', desc: 'Sistem rumah pintar mencatat bahwa TV di Ruang Tamu dimatikan pada pukul 21:45 dan tidak pernah dinyalakan lagi malam ini.' },
+                gramophone: { name: 'Gramofon Antik', desc: 'Sebuah alat pemutar piringan hitam klasik di Ruang Musik. Beroperasi murni menggunakan putaran tuas mekanik (pegas) tanpa memerlukan daya listrik sedikit pun.' },
+                cyanide_vial: { name: 'Botol Kaca Kecil (Sianida)', desc: 'Sebuah botol kaca kecil kosong yang disembunyikan secara terburu-buru di dalam tanah pot tanaman hias di Ruang Musik.' },
+                vinyl: { name: 'Sisa Piringan Hitam', desc: 'Piringan hitam Beethoven terpasang di Gramofon. Jarumnya berhenti tepat di pertengahan lagu.' },
+                breaker_box: { name: 'Kotak Sekring Utama', desc: 'Sekring utama rumah diturunkan secara manual. Seseorang dengan sengaja mematikan listrik rumah.' },
+                footprints: { name: 'Jejak Sepatu Lumpur', desc: 'Jejak sepatu pria berlumpur berukuran 42 di dekat kotak sekring. Corak solnya khas sepatu pantofel kulit mahal.' },
+                divorce_papers: { name: 'Draft Surat Cerai', desc: 'Dokumen perceraian yang belum ditandatangani di laci perpustakaan. Eleanor akan ditinggalkan tanpa harta gono-gini jika ini disahkan besok.' },
+                financial_report: { name: 'Laporan Keuangan Internal', desc: 'Dokumen rahasia yang menunjukkan Julian Vance telah menggelapkan dana perusahaan sebesar $2 Juta ke rekening pribadinya.' },
+                tea_flask: { name: 'Botol Teh Dr. Lin', desc: 'Hanya berisi teh chamomile biasa.' },
+                syringe: { name: 'Alat Suntik Medis', desc: 'Ditemukan di tas Dr. Lin. Bersih, belum digunakan.' },
+                shoes_julian: { name: 'Sepatu Julian Vance', desc: 'Sepatu kulit mahal berukuran 42 milik Julian. Terdapat sisa lumpur basah pada celah-celah solnya.' }
+            },
+            
+            suspects: {
+                eleanor: {
+                    id: 'eleanor', name: 'Eleanor Vale (Istri Korban)',
+                    desc: 'Dingin dan tidak terlihat bersedih. Pernikahannya dengan Adrian dikenal bermasalah.',
+                    statements: [
+                        { id: 'e1', text: 'Adrian dan saya memang sering bertengkar, tapi saya tidak membunuhnya.', breakable: false },
+                        { id: 'e2', text: 'Saya berada di Ruang Tamu sejak pukul 22:00. Saya duduk menonton TV sampai listrik mati pukul 22:30.', breakable: true, targetEvidence: 'tv_log', successText: 'Baiklah, saya berbohong! Saya sedang menangis membaca draf cerai itu, bukan menonton TV.' },
+                        { id: 'e3', text: 'Saat mati lampu, saya tetap di sofa sampai Marcus datang membawa senter.', breakable: false }
+                    ], broken: false, confession: 'Saya tahu tentang draft cerai itu. Saya membencinya, tapi saya bersumpah tidak membunuhnya!'
+                },
+                julian: {
+                    id: 'julian', name: 'Julian Vance (Rekan Bisnis)',
+                    desc: 'Pria arogan dan licik. Selalu memakai pakaian dan sepatu kulit mahal.',
+                    statements: [
+                        { id: 'j1', text: 'Kematian Adrian adalah tragedi bagi perusahaan. Kami adalah partner yang sangat solid.', breakable: true, targetEvidence: 'financial_report', successText: 'Sialan... Kau menemukan catatan penggelapan itu.' },
+                        { id: 'j2', text: 'Saya berada di Ruang Musik sendirian sejak pukul 22:10 untuk menenangkan diri.', breakable: false },
+                        { id: 'j3', text: 'Saya memutar piringan hitam. Tepat pukul 22:30 listrik mati dan alunan musik dari gramofon berhenti seketika karena tak ada listrik.', breakable: true, targetEvidence: 'gramophone', isCoreLie: true }
+                    ], broken: false, confession: 'Kau benar, gramofon itu mekanik! Baiklah, aku ke taman untuk mematikan sekring pukul 22:30. Aku hanya ingin menakut-nakutinya! Tapi saat lampu menyala, dia sudah mati!'
+                },
+                dr_lin: {
+                    id: 'dr_lin', name: 'Dr. Victor Lin (Dokter Pribadi)',
+                    desc: 'Tenang dan analitis. Mengurus kesehatan Adrian yang memburuk akhir-akhir ini.',
+                    statements: [
+                        { id: 'l1', text: 'Saya yang menyiapkan botol obat rutin Adrian di mejanya tadi sore.', breakable: false },
+                        { id: 'l2', text: 'Saya berada di Dapur membuat teh sejak 22:15. Marcus masuk sekitar 22:28.', breakable: false },
+                        { id: 'l3', text: 'Saya tidak membawa peralatan medis apapun malam ini.', breakable: true, targetEvidence: 'syringe', successText: 'Itu hanya suntikan vitamin cadangan, Detektif. Tidak ada racun di sana.' }
+                    ], broken: false
+                },
+                clara: {
+                    id: 'clara', name: 'Clara Hayes (Asisten Pribadi)',
+                    desc: 'Terlihat gugup dan lelah. Membawa banyak dokumen malam ini.',
+                    statements: [
+                        { id: 'c1', text: 'Tuan Vale adalah atasan yang baik. Saya sangat menghormatinya.', breakable: false },
+                        { id: 'c2', text: 'Saya menyusun dokumen di Perpustakaan sejak pukul 22:00 sampai listrik padam.', breakable: false }
+                    ], broken: false
+                },
+                marcus: {
+                    id: 'marcus', name: 'Marcus Thorne (Kepala Pelayan)',
+                    desc: 'Pelayan tua yang setia. Ekspresinya datar dan suaranya berat.',
+                    statements: [
+                        { id: 'm1', text: 'Saya masuk ke dapur pukul 22:28. Dr. Lin sudah ada di sana.', breakable: false },
+                        { id: 'm2', text: 'Saat lampu mati 22:30, saya langsung mengambil senter dan pergi ke taman belakang mengecek kotak sekring.', breakable: false },
+                        { id: 'm3', text: 'Sekring utama dimatikan secara manual. Seseorang merencanakannya.', breakable: false }
+                    ], broken: false
+                }
+            }
+        };
+
+        let md_state = {
+            currentView: 'home',
+            foundEvidence: [],
+            notes: '',
+            deductions: { q1: '', q2: '', q3: '' },
+            activeSuspect: null,
+            activeStatementIndex: -1
+        };
+
+        const mdAppContent = document.getElementById('contentArea');
+        const mdMenuBtn = document.getElementById('menuBtn');
+        const mdNavMenu = document.getElementById('navMenu');
+        const mdNavOverlay = document.getElementById('navOverlay');
+        const mdNavLinks = document.querySelectorAll('.nav-link');
+        const mdNotification = document.getElementById('notification');
+        const mdNotificationText = document.getElementById('notificationText');
+        const mdModal = document.getElementById('contradictionModal');
+        const mdCloseModalBtn = document.getElementById('closeModal');
+        const mdModalStatementText = document.getElementById('modalStatementText');
+        const mdEvidenceSelect = document.getElementById('evidenceSelect');
+        const mdContradictionFeedback = document.getElementById('contradictionFeedback');
+
+        const mdSysModal = document.getElementById('sysModal');
+        const mdSysModalTitle = document.getElementById('sysModalTitle');
+        const mdSysModalText = document.getElementById('sysModalText');
+        const mdSysModalButtons = document.getElementById('sysModalButtons');
+
+        window.showSysAlert = function(title, message) {
+            mdSysModalTitle.textContent = title;
+            mdSysModalTitle.style.color = '#fff';
+            mdSysModalText.innerHTML = message;
+            mdSysModalButtons.innerHTML = `<button class="md-btn md-btn-primary" onclick="closeSysModal()">OK, Mengerti</button>`;
+            mdSysModal.classList.add('active');
+        };
+
+        window.showSysConfirm = function(title, message, onConfirmCallback) {
+            mdSysModalTitle.textContent = title;
+            mdSysModalTitle.style.color = 'var(--accent-red)';
+            mdSysModalText.innerHTML = message;
+            
+            mdSysModalButtons.innerHTML = `
+                <button class="md-btn md-btn-secondary" style="width: auto;" onclick="closeSysModal()">Batal</button>
+                <button class="md-btn md-btn-primary" style="width: auto;" id="btnSysConfirm">Ya, Lanjutkan</button>
+            `;
+            
+            document.getElementById('btnSysConfirm').onclick = function() {
+                closeSysModal();
+                onConfirmCallback();
+            };
+            
+            mdSysModal.classList.add('active');
+        };
+
+        window.closeSysModal = function() {
+            mdSysModal.classList.remove('active');
+        };
+
+        function initGame() {
+            mdRenderView('home');
+            setupEventListeners();
+        }
+
+        function setupEventListeners() {
+            mdMenuBtn.addEventListener('click', mdToggleMenu);
+            mdNavOverlay.addEventListener('click', mdToggleMenu);
+            
+            mdNavLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const target = e.target.getAttribute('data-target');
+                    mdToggleMenu();
+                    mdRenderView(target);
+                    mdNavLinks.forEach(l => l.classList.remove('active-link'));
+                    e.target.classList.add('active-link');
+                });
+            });
+
+            mdCloseModalBtn.addEventListener('click', mdCloseModal);
+        }
+
+        function mdToggleMenu() {
+            mdMenuBtn.classList.toggle('active');
+            mdNavMenu.classList.toggle('active');
+            mdNavOverlay.classList.toggle('active');
+        }
+
+        function mdAddEvidence(id) {
+            if (!md_state.foundEvidence.includes(id)) {
+                md_state.foundEvidence.push(id);
+                mdShowNotification(md_db.evidence[id].name);
+                
+                if (id === 'footprints' && !md_state.foundEvidence.includes('shoes_julian')) {
+                    setTimeout(() => {
+                        md_state.foundEvidence.push('shoes_julian');
+                        mdShowNotification(md_db.evidence['shoes_julian'].name);
+                    }, 2500); 
+                }
+            }
+        }
+
+        function mdShowNotification(text) {
+            mdNotificationText.textContent = text;
+            mdNotification.classList.add('show');
+            setTimeout(() => {
+                mdNotification.classList.remove('show');
+            }, 4000);
+        }
+
+        window.handleExploreLocation = function(locId) {
+            const loc = md_db.locations.find(l => l.id === locId);
+            if (!loc) return;
+            
+            loc.searched = true;
+            loc.evidenceToFind.forEach(item => mdAddEvidence(item));
+            
+            mdRenderLocations();
+            showSysAlert("Lokasi Digeledah", `Anda telah memeriksa <strong>${loc.name}</strong>.<br><br>Beberapa petunjuk baru berhasil ditemukan. Silakan periksa menu 'Daftar Bukti'.`);
+        };
+
+        function mdRenderView(viewName) {
+            md_state.currentView = viewName;
+            
+            switch(viewName) {
+                case 'home': mdRenderHome(); break;
+                case 'locations': mdRenderLocations(); break;
+                case 'suspects': mdRenderSuspects(); break;
+                case 'evidence': mdRenderEvidence(); break;
+                case 'timeline': mdRenderTimeline(); break;
+                case 'notes': mdRenderNotes(); break;
+                case 'deduction': mdRenderDeduction(); break;
+                case 'accusation': mdRenderAccusation(); break;
+            }
+        }
+
+        function mdRenderHome() {
+            mdAppContent.innerHTML = `
+                <div style="max-width: 600px; margin: 0 auto;">
+                    <div class="text-center" style="margin-bottom: 2rem; margin-top: 1rem;">
+                        <h1 style="font-size: 2.2rem; letter-spacing: 2px; margin-bottom: 0.5rem;" class="text-accent">CASE FILE:</h1>
+                        <h2 style="font-size: 1.6rem;">THE MIDNIGHT DINNER</h2>
+                        <p class="text-muted" style="margin-top: 1rem; font-style: italic;">"Setiap kebohongan meninggalkan jejak."</p>
+                    </div>
+                    
+                    <div class="md-card narrative" style="margin-top: 2rem;">
+                        <p>Detektif Elias Morgan,</p>
+                        <p>Malam ini, pukul 22:34, pengusaha Adrian Vale (52) ditemukan tewas di ruang kerjanya di Blackwood House. Ruangan terkunci rapat dari dalam. Tidak ada tanda-tanda pembobolan, dan tidak ada luka di tubuh korban.</p>
+                        <p>Tepat pada pukul 22:30, aliran listrik di rumah tersebut terputus secara misterius selama 4 menit. Saat listrik menyala, Adrian sudah meregang nyawa.</p>
+                        <p>Lima orang berada di dalam rumah dan sekitarnya. Mereka semua memiliki motif dan alibi. Namun, secara logis, <strong>salah satu alibi tersebut mengandung kebohongan waktu yang fatal</strong>.</p>
+                        <p>Tugas Anda: Geledah lokasi, kumpulkan bukti fisik, bantah kebohongan tersangka, dan buat tuduhan akhir yang akurat.</p>
+                    </div>
+                    
+                    <button class="md-btn md-btn-primary" onclick="document.querySelector('[data-target=\\'locations\\']').click();">Mulai Penyelidikan</button>
+                </div>
+            `;
+        }
+
+        function mdRenderLocations() {
+            let html = `<h2 style="margin-bottom: 1.5rem;">Eksplorasi Lokasi</h2>
+                        <p class="text-muted narrative">Pilih lokasi untuk melakukan penggeledahan dan mencari bukti fisik.</p>
+                        <div class="location-grid">`;
+            
+            md_db.locations.forEach(loc => {
+                const isSearched = loc.searched;
+                html += `
+                    <div class="md-card card-clickable" onclick="handleExploreLocation('${loc.id}')">
+                        <h3 style="margin-bottom: 0.5rem; color: ${isSearched ? 'var(--text-muted)' : 'white'}">
+                            ${loc.name} ${isSearched ? '<span class="badge">Telah Digeledah</span>' : ''}
+                        </h3>
+                        <p class="text-muted" style="font-size: 0.9rem;">${loc.desc}</p>
+                    </div>
+                `;
+            });
+            html += `</div>`;
+            mdAppContent.innerHTML = html;
+        }
+
+        function mdRenderSuspects() {
+            let html = `<h2 style="margin-bottom: 1.5rem;">Interogasi Tersangka</h2>
+                        <p class="text-muted narrative">Baca pernyataan alibi mereka. Jika ada kalimat yang kontradiksi dengan bukti yang Anda miliki, tekan 'Bantah Pernyataan'.</p>
+                        <div class="suspect-grid">`;
+            
+            Object.values(md_db.suspects).forEach(suspect => {
+                html += `
+                    <div class="md-card">
+                        <h3 style="margin-bottom: 0.2rem; color: var(--accent-red);">${suspect.name}</h3>
+                        <p class="text-muted" style="margin-bottom: 1rem; font-size: 0.9rem;">${suspect.desc}</p>
+                        <h4 style="font-size: 0.9rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.3rem;">Pernyataan:</h4>
+                        <ul class="statement-list">
+                `;
+                
+                if (suspect.broken) {
+                    html += `
+                        <div class="statement-item" style="border-left-color: var(--accent-red); background-color: rgba(153, 27, 27, 0.1);">
+                            <p style="color: #fca5a5; font-weight: bold;">[ALIBI TERBANTAHKAN - KEBOHONGAN TERBONGKAR]</p>
+                            <p>"${suspect.confession}"</p>
+                        </div>
+                    `;
+                } else {
+                    suspect.statements.forEach((stmt, index) => {
+                        html += `
+                            <li class="statement-item">
+                                <p>"${stmt.text}"</p>
+                                ${stmt.breakable ? `<button class="md-btn btn-bantah" onclick="openContradictionModal('${suspect.id}', ${index})">Bantah Pernyataan</button>` : ''}
+                            </li>
+                        `;
+                    });
+                }
+                html += `</ul></div>`;
+            });
+            html += `</div>`;
+            mdAppContent.innerHTML = html;
+        }
+
+        function mdRenderEvidence() {
+            let html = `<h2 style="margin-bottom: 1.5rem;">Daftar Bukti Fisik</h2>`;
+            if (md_state.foundEvidence.length === 0) {
+                html += `<p class="narrative">Belum ada bukti yang ditemukan. Silakan geledah ruangan di menu 'Lokasi'.</p>`;
+            } else {
+                html += `<p class="text-muted narrative">Total ditemukan: ${md_state.foundEvidence.length} / 16</p><div class="location-grid">`;
+                const displayList = [...md_state.foundEvidence].reverse(); 
+                displayList.forEach(id => {
+                    const ev = md_db.evidence[id];
+                    html += `
+                        <div class="md-card" style="border-left: 3px solid var(--accent-red);">
+                            <h3 style="margin-bottom: 0.5rem; font-size: 1.1rem;">${ev.name}</h3>
+                            <p style="font-size: 0.95rem; color: var(--text-muted);">${ev.desc}</p>
+                        </div>
+                    `;
+                });
+                html += `</div>`;
+            }
+            mdAppContent.innerHTML = html;
+        }
+
+        function mdRenderTimeline() {
+            mdAppContent.innerHTML = `
+                <h2 style="margin-bottom: 1.5rem;">Linimasa Kejadian</h2>
+                <div class="md-card narrative" style="margin-bottom: 2rem;">
+                    Catatan: Linimasa disusun berdasarkan kesaksian dan log sistem elektronik rumah pintar.
+                </div>
+                <div class="timeline-container">
+                    <div class="timeline-event">
+                        <div class="timeline-time">21:00</div>
+                        <div class="timeline-desc">Acara makan malam selesai. Para tamu berpencar.</div>
+                    </div>
+                    <div class="timeline-event">
+                        <div class="timeline-time">21:45 (Log Sistem)</div>
+                        <div class="timeline-desc">Smart TV di Ruang Tamu dimatikan.</div>
+                    </div>
+                    <div class="timeline-event">
+                        <div class="timeline-time">22:00 - 22:15</div>
+                        <div class="timeline-desc">Adrian masuk & mengunci Ruang Kerja. Clara ke Perpustakaan. Julian ke Ruang Musik.</div>
+                    </div>
+                    <div class="timeline-event">
+                        <div class="timeline-time">22:28</div>
+                        <div class="timeline-desc">Marcus masuk ke Dapur menyusul Dr. Lin.</div>
+                    </div>
+                    <div class="timeline-event">
+                        <div class="timeline-time text-accent">22:30 (Log Medis & Sistem)</div>
+                        <div class="timeline-desc text-accent font-bold">Jadwal Adrian meminum kapsul jantung harian.<br>Sistem mencatat LISTRIK UTAMA PADAM tepat pada waktu ini.</div>
+                    </div>
+                    <div class="timeline-event">
+                        <div class="timeline-time">22:34</div>
+                        <div class="timeline-desc">Listrik dinyalakan kembali oleh Marcus. Adrian ditemukan tewas.</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function mdRenderNotes() {
+            mdAppContent.innerHTML = `
+                <h2 style="margin-bottom: 1.5rem;">Buku Catatan Detektif</h2>
+                <p class="text-muted narrative">Gunakan ruang ini untuk merangkum teori Anda. Data tidak akan hilang saat Anda berpindah menu.</p>
+                <textarea id="notepadArea" placeholder="Ketik teori dan kecurigaan Anda di sini..." oninput="md_state.notes = this.value">${md_state.notes}</textarea>
+            `;
+        }
+
+        function mdRenderDeduction() {
+            mdAppContent.innerHTML = `
+                <h2 style="margin-bottom: 1.5rem;">Papan Deduksi</h2>
+                <p class="text-muted narrative">Jawab pertanyaan ini untuk merapikan alur logika sebelum Anda membuat tuduhan akhir.</p>
+                
+                <div class="md-card">
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">1. Mengapa pintu Ruang Kerja terkunci dari dalam tanpa dibobol?</label>
+                    <select onchange="md_state.deductions.q1 = this.value">
+                        <option value="">-- Pilih Hipotesis --</option>
+                        <option value="a" ${md_state.deductions.q1 === 'a' ? 'selected' : ''}>Pembunuh punya kunci duplikat dan menguncinya dari luar.</option>
+                        <option value="b" ${md_state.deductions.q1 === 'b' ? 'selected' : ''}>Korban sendiri yang mengunci, pembunuh sudah meracuni obatnya sebelum ia masuk (Perangkap).</option>
+                    </select>
+
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: bold; margin-top: 1rem;">2. Mengapa pelaku sengaja mematikan listrik jam 22:30?</label>
+                    <select onchange="md_state.deductions.q2 = this.value">
+                        <option value="">-- Pilih Hipotesis --</option>
+                        <option value="a" ${md_state.deductions.q2 === 'a' ? 'selected' : ''}>Untuk menyusup ke ruang kerja dalam gelap.</option>
+                        <option value="b" ${md_state.deductions.q2 === 'b' ? 'selected' : ''}>Bertepatan jadwal minum obat: Menutupi suara kematian korban dan menutupi pergerakannya.</option>
+                    </select>
+                    
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: bold; margin-top: 1rem;">3. Alibi siapa yang paling mustahil secara teknis/fisika?</label>
+                    <select onchange="md_state.deductions.q3 = this.value">
+                        <option value="">-- Pilih Hipotesis --</option>
+                        <option value="a" ${md_state.deductions.q3 === 'a' ? 'selected' : ''}>Alibi Julian: Mengatakan gramofon antik mati saat listrik padam, padahal alat itu mekanik murni.</option>
+                        <option value="b" ${md_state.deductions.q3 === 'b' ? 'selected' : ''}>Alibi Eleanor: TV sudah dimatikan sistem sejak jam 21:45.</option>
+                    </select>
+                </div>
+            `;
+        }
+
+        function mdRenderAccusation() {
+            mdAppContent.innerHTML = `
+                <h2 style="margin-bottom: 1.5rem; color: var(--accent-red);">Buat Tuduhan Akhir</h2>
+                <div class="md-card narrative" style="border-left: 4px solid var(--accent-red);">
+                    <strong>PERINGATAN:</strong> Mengajukan laporan akan mengakhiri permainan. Pastikan Anda telah membongkar semua kebohongan tersangka dan memahami gambaran utuh pembunuhan ini.
+                </div>
+                
+                <div class="md-card">
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Siapa Pelaku Pembunuhan?</label>
+                    <select id="accuseKiller">
+                        <option value="">-- Pilih Tersangka --</option>
+                        <option value="eleanor">Eleanor Vale (Istri Korban)</option>
+                        <option value="julian">Julian Vance (Rekan Bisnis)</option>
+                        <option value="dr_lin">Dr. Victor Lin (Dokter Pribadi)</option>
+                        <option value="clara">Clara Hayes (Asisten)</option>
+                        <option value="marcus">Marcus Thorne (Pelayan Kepala)</option>
+                    </select>
+
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: bold; margin-top: 1rem;">Apa Metode Pembunuhannya?</label>
+                    <select id="accuseMethod">
+                        <option value="">-- Pilih Metode --</option>
+                        <option value="wiski">Meracuni gelas wiski di Ruang Tamu</option>
+                        <option value="kapsul">Menukar isi Kapsul Obat jantung dengan Sianida sebelum korban masuk</option>
+                        <option value="suntik">Menyuntikkan racun saat listrik padam secara langsung</option>
+                    </select>
+                    
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: bold; margin-top: 1rem;">Apa Motif Utama Pelaku?</label>
+                    <select id="accuseMotive">
+                        <option value="">-- Pilih Motif --</option>
+                        <option value="cerai">Mencegah perceraian dan hilangnya warisan jutaan dolar</option>
+                        <option value="uang">Menutupi bukti penggelapan dana perusahaan 2 Juta Dolar</option>
+                        <option value="dendam">Dendam masa lalu atas bunuh diri keluarga</option>
+                    </select>
+                    
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: bold; margin-top: 1rem;">Bukti Kunci yang Meruntuhkan Alibi Pelaku?</label>
+                    <select id="accuseEvidence">
+                        <option value="">-- Pilih Bukti Kunci --</option>
+                        <option value="tv_log">Log Smart TV yang mati 21:45</option>
+                        <option value="gramophone">Mekanisme Mekanik Gramofon Antik (tanpa listrik)</option>
+                        <option value="shoes_julian">Jejak Sepatu Berlumpur berukuran 42</option>
+                        <option value="medical_record">Catatan Medis terkait Waktu</option>
+                    </select>
+                    
+                    <button class="md-btn md-btn-primary" style="margin-top: 2rem; font-size: 1.1rem; padding: 1rem; font-weight: bold;" onclick="processAccusation()">AJUKAN LAPORAN PENYELIDIKAN</button>
+                </div>
+            `;
+        }
+
+        window.openContradictionModal = function(suspectId, statementIndex) {
+            md_state.activeSuspect = suspectId;
+            md_state.activeStatementIndex = statementIndex;
+            const stmt = md_db.suspects[suspectId].statements[statementIndex];
+            
+            mdModalStatementText.textContent = `"${stmt.text}"`;
+            
+            mdEvidenceSelect.innerHTML = `<option value="">-- Pilih Bukti untuk Membantah --</option>`;
+            md_state.foundEvidence.forEach(id => {
+                mdEvidenceSelect.innerHTML += `<option value="${id}">${md_db.evidence[id].name}</option>`;
+            });
+            
+            mdContradictionFeedback.style.display = 'none';
+            mdModal.classList.add('active');
+        };
+
+        function mdCloseModal() {
+            mdModal.classList.remove('active');
+            md_state.activeSuspect = null;
+            md_state.activeStatementIndex = -1;
+        }
+
+        window.handleContradictionSubmit = function() {
+            const selectedEvidenceId = mdEvidenceSelect.value;
+            if (!selectedEvidenceId) return;
+            
+            const suspect = md_db.suspects[md_state.activeSuspect];
+            const statement = suspect.statements[md_state.activeStatementIndex];
+            
+            if (statement.targetEvidence === selectedEvidenceId) {
+                mdContradictionFeedback.style.display = 'block';
+                mdContradictionFeedback.style.backgroundColor = 'rgba(21, 128, 61, 0.2)';
+                mdContradictionFeedback.style.color = '#4ade80';
+                mdContradictionFeedback.style.border = '1px solid #15803d';
+                mdContradictionFeedback.innerHTML = "<strong>KONTRAKSI DITEMUKAN!</strong> Bukti ini membongkar kebohongannya.";
+                
+                if (statement.isCoreLie) {
+                    suspect.broken = true;
+                } else {
+                    statement.text = statement.successText;
+                    statement.breakable = false;
+                }
+                
+                setTimeout(() => {
+                    mdCloseModal();
+                    mdRenderSuspects();
+                }, 2500);
+                
+            } else {
+                mdContradictionFeedback.style.display = 'block';
+                mdContradictionFeedback.style.backgroundColor = 'rgba(153, 27, 27, 0.2)';
+                mdContradictionFeedback.style.color = '#fca5a5';
+                mdContradictionFeedback.style.border = '1px solid #991b1b';
+                mdContradictionFeedback.innerHTML = "<strong>GAGAL:</strong> Bukti ini tidak memiliki relevansi logis untuk membantah pernyataan tersebut.";
+            }
+        };
+
+        window.processAccusation = function() {
+            const killer = document.getElementById('accuseKiller').value;
+            const method = document.getElementById('accuseMethod').value;
+            const motive = document.getElementById('accuseMotive').value;
+            const evidence = document.getElementById('accuseEvidence').value;
+            
+            if (!killer || !method || !motive || !evidence) {
+                showSysAlert("Formulir Belum Lengkap", "Detektif, Anda harus melengkapi seluruh kolom (Pelaku, Metode, Motif, dan Bukti Utama) sebelum menyerahkan laporan akhir ke Kepolisian Pusat.");
+                return;
+            }
+            
+            showSysConfirm(
+                "Kirim Laporan Final?", 
+                "PERINGATAN: Mengirim laporan ini akan mengakhiri investigasi malam ini. Anda tidak bisa mengubah kesimpulan lagi. Apakah Anda sangat yakin dengan deduksi ini?", 
+                () => {
+                    let score = 0;
+                    if (killer === 'julian') score++;
+                    if (method === 'kapsul') score++;
+                    if (motive === 'uang') score++;
+                    if (evidence === 'gramophone') score++;
+                    
+                    showEndingScreen(score, killer);
+                }
+            );
+        };
+
+        function showEndingScreen(score, killer) {
+            document.getElementById('mainHeader').style.display = 'none';
+            
+            let title = "";
+            let statusClass = "";
+            let statusText = "";
+            let endingTag = "";
+            let endingDesc = "";
+            
+            if (score === 4) {
+                title = "TUDUHAN BENAR & DEDUKSI SEMPURNA";
+                statusClass = "solved";
+                statusText = "KASUS SELESAI";
+                endingTag = "ENDING 1/4 : THE TRUE DETECTIVE";
+                endingDesc = `Luar biasa, Detektif Morgan. Analisismu tajam tanpa celah. 
+                <br><br>
+                <strong>KRONOLOGI SEBENARNYA:</strong><br>
+                Julian Vance tahu bahwa Adrian akan meminum obat jantungnya tepat pukul 22:30. Julian diam-diam menukar isi kapsul tersebut dengan sianida sebelum korban masuk ke ruang kerjanya.
+                <br><br>
+                Tepat pukul 22:30, Julian sengaja memutus aliran listrik. Kegelapan ini menutupi suara rintihan korban, sekaligus memberi Julian waktu berjalan dari taman, menyembunyikan botol racun di pot tanaman Ruang Musik, dan pura-pura bingung karena mati lampu.
+                <br><br>
+                <strong>KESALAHAN FATAL PELAKU:</strong><br>
+                Ia mengarang alibi bahwa alunan piringan hitam berhenti karena mati lampu. Padahal, <strong>gramofon antik itu bekerja murni menggunakan putaran pegas mekanik, bukan listrik</strong>. Bukti telak inilah yang meruntuhkan kebohongannya di pengadilan.
+                <br><br>
+                Julian dijatuhi hukuman penjara seumur hidup, dan karir Anda melesat tajam.`;
+            } 
+            else if (killer === 'julian') {
+                title = "TUDUHAN BENAR, NAMUN BUKTI LEMAH";
+                statusClass = "failed";
+                statusText = "KASUS GAGAL";
+                endingTag = "ENDING 2/4 : KEADILAN YANG LEPAS";
+                endingDesc = `Anda berhasil menebak pelakunya (Julian Vance). Namun sayang, rincian logika (Metode / Motif / Bukti Kunci) yang Anda ajukan di laporan mengandung kesalahan yang fatal.
+                <br><br>
+                <strong>HASIL PERSIDANGAN:</strong><br>
+                Karena narasi investigasi Anda cacat, pengacara mahal Julian berhasil mematahkan argumen Anda di depan hakim. Hakim memutus Julian bebas dari segala tuntutan karena kurangnya bukti yang tak terbantahkan.
+                <br><br>
+                Julian tersenyum sinis ke arah Anda saat keluar dari ruang sidang. Kasus ini menjadi noda permanen dalam karir kepolisian Anda.
+                <br><br>
+                <em>(Petunjuk: Periksa ulang cara kerja Gramofon dan pastikan kapan tepatnya korban dijadwalkan minum obat).</em>`;
+            }
+            else {
+                title = "TUDUHAN SALAH - KEADILAN BUTA";
+                statusClass = "failed";
+                statusText = "KASUS GAGAL";
+                endingTag = (killer === 'eleanor') ? "ENDING 3/4 : KAMBING HITAM" : "ENDING 4/4 : TERDISTRAKSI ILUSI";
+                endingDesc = `Anda telah menangkap orang yang salah. Laporan Anda menuduh <strong>${document.getElementById('accuseKiller').options[document.getElementById('accuseKiller').selectedIndex].text}</strong>.
+                <br><br>
+                <strong>HASIL INVESTIGASI:</strong><br>
+                Penyelidikan Anda terdistraksi oleh *Red Herring* (petunjuk palsu) seperti konflik perceraian atau gelas wiski biasa. Anda mengabaikan inkonsistensi ilmu fisika yang paling fatal pada alibi pelaku asli malam itu.
+                <br><br>
+                Pembunuh yang sebenarnya, Julian Vance, kini bebas mengambil alih perusahaan dan menutupi jejak penggelapan uangnya selamanya. Orang tak bersalah dijebloskan ke penjara karena kelalaian Anda.`;
+            }
+            
+            mdAppContent.innerHTML = `
+                <div class="report-card" style="animation: fadeIn 1s ease;">
+                    <div class="report-header">
+                        <h2 style="color: #18181b;">KEPOLISIAN METROPOLITAN</h2>
+                        <p style="font-weight: bold; letter-spacing: 1px;">DEPARTEMEN INVESTIGASI KRIMINAL</p>
+                        <div class="stamp ${statusClass}">${statusText}</div>
+                    </div>
+                    
+                    <div class="text-center">
+                        <div class="ending-tag">${endingTag}</div>
+                        <h3 style="color: ${score === 4 ? '#15803d' : '#b91c1c'}; margin-bottom: 2rem;">${title}</h3>
+                    </div>
+                    
+                    <div style="margin-bottom: 2rem; border: 1px solid #d4d4d8; padding: 1rem; background-color: #fff;">
+                        <p><strong>Penyidik:</strong> Detektif Elias Morgan</p>
+                        <p><strong>Subjek Kasus:</strong> Kematian Adrian Vale</p>
+                        <p><strong>Skor Akurasi Laporan:</strong> ${score} / 4 Parameter Tepat</p>
+                    </div>
+                    
+                    <div style="border-top: 2px dashed #18181b; padding-top: 1.5rem; line-height: 1.8;">
+                        <strong>RINGKASAN PENYELESAIAN KASUS:</strong><br>
+                        <p style="margin-top: 1rem; color: #27272a;">${endingDesc}</p>
+                    </div>
+                    
+                    <div style="text-align: center; margin-top: 3rem;">
+                        <button class="md-btn md-btn-primary" style="max-width: 250px; background-color: #18181b; border-color: #18181b; padding: 1rem;" onclick="location.reload()">MAIN ULANG KASUS</button>
+                    </div>
+                </div>
+            `;
+            
+            window.scrollTo(0, 0);
+        }
+
+        // --- GLOBAL INITIALIZATION COMBINED --- //
+        window.onload = function() {
+            init(); 
+            initGame(); 
+        };
     </script>
 </body>
 </html>
