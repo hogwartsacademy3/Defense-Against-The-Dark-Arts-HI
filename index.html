@@ -643,6 +643,11 @@
                 <button onclick="navigate('quiz')" class="w-full flex items-center px-4 py-3 rounded-lg text-gray-400 hover:bg-cardBg hover:text-goldAcc transition-all duration-200" id="nav-quiz">
                     <i class="fa-solid fa-clipboard-question w-6"></i> Ujian Evaluasi (Bab 4-6)
                 </button>
+
+                <!-- NEW BUTTON FOR QUIZ 2 -->
+                <button onclick="navigate('quiz2')" class="w-full flex items-center px-4 py-3 rounded-lg text-gray-400 hover:bg-cardBg hover:text-goldAcc transition-all duration-200 mt-2" id="nav-quiz2">
+                    <i class="fa-solid fa-clipboard-check w-6"></i> Ujian Evaluasi (Bab 7-8)
+                </button>
                 
                 <!-- NEW BUTTON FOR MIDNIGHT DINNER -->
                 <button onclick="navigate('case-file')" class="w-full flex items-center px-4 py-3 rounded-lg text-gray-400 hover:bg-cardBg hover:text-goldAcc transition-all duration-200 mt-2" id="nav-case-file-btn">
@@ -738,7 +743,7 @@
             </div>
         </section>
 
-        <!-- VIEW: QUIZ EVALUATION -->
+        <!-- VIEW: QUIZ EVALUATION 1 -->
         <section id="view-quiz" class="view-section">
             <div class="bg-cardBg border border-borderCol rounded-lg p-6 md:p-12 shadow-2xl relative min-h-[500px]">
                 <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-red-800 to-transparent opacity-50"></div>
@@ -784,6 +789,57 @@
                     </div>
                     <div class="max-w-lg mx-auto bg-darkBg p-6 rounded border border-borderCol">
                         <p id="quiz-feedback" class="text-lg italic text-textCol leading-relaxed"></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW: QUIZ EVALUATION 2 -->
+        <section id="view-quiz2" class="view-section">
+            <div class="bg-cardBg border border-borderCol rounded-lg p-6 md:p-12 shadow-2xl relative min-h-[500px]">
+                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-blue-800 to-transparent opacity-50"></div>
+                
+                <header class="mb-10 text-center border-b border-borderCol pb-6">
+                    <h1 class="text-3xl md:text-4xl font-bold text-goldAcc mb-4 font-heading">Ujian Evaluasi: Bab 7 - 8</h1>
+                    <p class="text-gray-400">Kerjakan ujian ini dengan teliti. Nilai akan langsung keluar setelah selesai.</p>
+                </header>
+
+                <!-- Kunci/Auth State -->
+                <div id="quiz2-auth" class="flex flex-col items-center justify-center py-10">
+                    <i class="fa-solid fa-lock text-5xl text-gray-600 mb-6"></i>
+                    <h3 class="text-2xl font-bold mb-3 text-white">Akses Ujian Terkunci</h3>
+                    <p class="text-gray-400 mb-8 text-center max-w-md">Masukkan kode akses dari Professor Poirot untuk memulai ujian. Peringatan: Ujian hanya dapat dikerjakan satu kali saja.</p>
+                    <div class="flex flex-col items-center w-full max-w-xs">
+                        <input type="password" id="quiz2-password" placeholder="Kode Akses" class="w-full bg-darkBg border border-borderCol rounded px-4 py-3 text-textCol focus:outline-none focus:border-goldAcc mb-4 text-center tracking-widest text-xl">
+                        <button onclick="checkQuiz2Password()" class="w-full bg-goldAcc text-darkBg px-6 py-3 rounded font-bold hover:bg-goldHover transition-colors shadow-lg">Buka Ujian</button>
+                        <p id="quiz2-error" class="text-red-500 mt-4 text-sm font-semibold hidden"><i class="fa-solid fa-circle-exclamation mr-1"></i> Kode akses salah!</p>
+                    </div>
+                </div>
+
+                <!-- Konten Kuis -->
+                <div id="quiz2-content" class="hidden">
+                    <div id="quiz2-questions-container" class="space-y-8 mb-10">
+                        <!-- Soal akan di-generate via JS -->
+                    </div>
+                    
+                    <div class="text-center pt-8 border-t border-borderCol flex flex-col items-center">
+                        <p id="quiz2-validation-error" class="text-red-500 mb-4 hidden font-bold"><i class="fa-solid fa-triangle-exclamation mr-2"></i> Harap jawab semua pertanyaan sebelum mengumpulkan kuis!</p>
+                        <button onclick="submitQuiz2()" class="bg-goldAcc text-darkBg px-10 py-4 rounded font-bold text-lg tracking-wide hover:bg-goldHover transition-all shadow-[0_4px_15px_rgba(197,160,89,0.3)]">
+                            <i class="fa-solid fa-check-double mr-2"></i> Kumpulkan Jawaban
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Hasil Kuis -->
+                <div id="quiz2-result" class="hidden text-center py-12">
+                    <i class="fa-solid fa-ranking-star text-7xl text-goldAcc mb-6 opacity-90"></i>
+                    <h2 class="text-4xl font-bold text-white mb-4 font-heading">Ujian Selesai!</h2>
+                    <p class="text-gray-400 mb-8">Berikut adalah rekapitulasi nilai akhir evaluasi Anda:</p>
+                    <div class="inline-block bg-darkBg border-2 border-goldAcc rounded-full w-40 h-40 flex items-center justify-center mx-auto mb-8 shadow-[0_0_40px_rgba(197,160,89,0.2)]">
+                        <span id="quiz2-score-display" class="text-5xl font-bold text-goldAcc font-heading">0/15</span>
+                    </div>
+                    <div class="max-w-lg mx-auto bg-darkBg p-6 rounded border border-borderCol">
+                        <p id="quiz2-feedback" class="text-lg italic text-textCol leading-relaxed"></p>
                     </div>
                 </div>
             </div>
@@ -1058,7 +1114,7 @@
             }
         ];
 
-        // QUIZ DATA
+        // QUIZ 1 DATA (Bab 4-6)
         const quizQuestions = [
             { q: "Hama taman dengan kepala berproporsi terlalu besar seperti kentang berbatu adalah...", options: ["Imp", "Gnome", "Doxy", "Bowtruckle"], a: 1 },
             { q: "Prosedur standar yang diakui dan efisien untuk mengusir Gnome dari taman disebut dengan Gnoming. Apa tahap awal dari prosedur tersebut?", options: ["Membius mereka dengan Stupefy", "Menyemprotkan Doxycide ke liangnya", "Menangkap kakinya dan memutarnya secara melingkar", "Menawarkan kutu kayu sebagai umpan"], a: 2 },
@@ -1077,11 +1133,34 @@
             { q: "Satu-satunya pertahanan mutlak yang dapat mengurai kembali molekul bayangan dari Gytrash adalah...", options: ["Foton intensitas tinggi menggunakan Lumos Solem atau Verdimillious", "Melarikan diri karena Gytrash tidak bisa dilukai", "Mantra pembius berturut-turut pada wujud ektoplasmiknya", "Perisai api magis (Protego Diabolica)"], a: 0 }
         ];
 
+        // QUIZ 2 DATA (Bab 7-8)
+        const quiz2Questions = [
+            { q: "Secara biologis, Fire Crab lebih menyerupai makhluk apa?", options: ["Kepiting laut raksasa", "Kura-kura darat berukuran besar", "Kalajengking bercangkang", "Manticore muda"], a: 1 },
+            { q: "Apa alasan utama Fire Crab menjadi sasaran para poachers?", options: ["Darahnya memiliki kekuatan penyembuhan", "Organ pembakarannya memiliki nilai jual tinggi", "Cangkangnya dihiasi berbagai batu permata berharga", "Dagingnya merupakan bahan ramuan langka"], a: 2 },
+            { q: "Di manakah habitat asli Fire Crab?", options: ["Hutan terlarang Inggris", "Kepulauan Fiji", "Pegunungan Skotlandia", "Laut Mediterania"], a: 1 },
+            { q: "Bagian tubuh Fire Crab yang berfungsi sebagai mekanisme pertahanan utama adalah...", options: ["Kepala", "Kaki depan", "Cangkang bagian depan", "Bagian posterior tubuh"], a: 3 },
+            { q: "Mengapa seorang penyihir tidak boleh berdiri di belakang Fire Crab?", options: ["Fire Crab dapat menggigit target dari belakang", "Fire Crab memiliki penglihatan sempurna di belakang tubuhnya", "Fire Crab dapat menembakkan ledakan api dan cairan membara dari belakang", "Fire Crab dapat mengeluarkan racun dari kakinya"], a: 2 },
+            { q: "Saat melakukan relokasi Fire Crab, posisi yang paling tepat untuk mendekatinya adalah...", options: ["Dari belakang", "Dari bawah tubuhnya", "Dari depan atau samping", "Dari atas cangkangnya"], a: 2 },
+            { q: "Mantra apakah yang dapat digunakan untuk mengangkat Fire Crab dari tanah sehingga mengurangi momentum serangannya?", options: ["Stupefy", "Wingardium Leviosa", "Impedimenta", "Expelliarmus"], a: 1 },
+            { q: "Jika seorang penyihir terpaksa menghadapi serangan api dari belakang Fire Crab, kombinasi pertahanan yang sesuai adalah...", options: ["Expelliarmus atau Lumos", "Stupefy atau Wingardium Leviosa", "Aqua Eructo atau Mantra Perisai Termal", "Impedimenta atau Riddikulus"], a: 2 },
+            { q: "Blast-Ended Skrewt merupakan hasil pembiakan silang antara...", options: ["Basilisk dan Manticore", "Fire Crab dan Acromantula", "Manticore dan Fire Crab", "Scorpion dan Fire Crab"], a: 2 },
+            { q: "Ketika baru menetas, Blast-Ended Skrewt memiliki ciri-ciri berikut, kecuali...", options: ["Bertubuh pucat", "Tidak memiliki mata", "Berbau seperti ikan busuk", "Memiliki cangkang berwarna emas"], a: 3 },
+            { q: "Apa perbedaan utama antara Blast-Ended Skrewt jantan dan betina?", options: ["Jantan memiliki penyengat beracun, sedangkan betina memiliki alat pengisap darah", "Jantan memiliki alat pengisap darah, sedangkan betina memiliki penyengat beracun", "Jantan memiliki sayap, sedangkan betina tidak", "Jantan dapat mengeluarkan api, sedangkan betina dapat mengeluarkan es"], a: 0 },
+            { q: "Mengapa menyerang cangkang Blast-Ended Skrewt dengan mantra biasa dianggap tidak efektif?", options: ["Cangkangnya dapat menyerap semua jenis sihir", "Cangkangnya memantulkan sebagian besar jinx, Stupefy, dan kutukan biasa", "Cangkangnya justru menjadi semakin lemah jika diserang", "Cangkangnya hanya dapat dihancurkan menggunakan sihir air"], a: 1 },
+            { q: "Bagian tubuh Blast-Ended Skrewt yang merupakan titik lemah anatomisnya adalah...", options: ["Kepala", "Ekor", "Cangkang atas", "Bagian bawah perut"], a: 3 },
+            { q: "Seorang penyihir melihat Blast-Ended Skrewt bersiap meluncur dengan menggunakan ledakan dari bagian belakang tubuhnya. Apa tindakan pertama yang paling tepat?", options: ["Menggunakan Stupefy langsung ke cangkangnya", "Berdiri diam dan menahan tabrakannya", "Menghindar ke samping agar Skrewt meluncur melewati dirinya", "Berlari ke arah belakang Skrewt"], a: 2 },
+            { q: "Setelah berhasil menghindari serangan Blast-Ended Skrewt dan bagian bawah perutnya terbuka, strategi paling efektif adalah...", options: ["Menyerang cangkang bagian atas", "Menggunakan Impedimenta atau Stupefy pada jaringan perut lunaknya", "Menggunakan Wingardium Leviosa pada ekornya", "Menyerang bagian belakang tubuhnya dengan kutukan biasa"], a: 1 }
+        ];
+
         let currentView = 'home';
         
         // Quiz State variables
         let hasTakenQuiz = false;
         let quizScore = 0;
+        
+        // Quiz 2 State variables
+        let hasTakenQuiz2 = false;
+        let quiz2Score = 0;
 
         // DOM Elements
         const drawer = document.getElementById('sidebar-drawer');
@@ -1093,6 +1172,7 @@
         const navHome = document.getElementById('nav-home');
         const navCourses = document.getElementById('nav-courses');
         const navQuiz = document.getElementById('nav-quiz');
+        const navQuiz2 = document.getElementById('nav-quiz2');
 
         // Lesson View Elements
         const lessonBreadcrumb = document.getElementById('lesson-breadcrumb');
@@ -1128,6 +1208,8 @@
                 document.getElementById('view-courses').classList.add('active');
             } else if (view === 'quiz') {
                 document.getElementById('view-quiz').classList.add('active');
+            } else if (view === 'quiz2') {
+                document.getElementById('view-quiz2').classList.add('active');
             } else if (view === 'case-file') {
                 document.getElementById('view-case-file').classList.add('active');
             } else if (view.startsWith('lesson_')) {
@@ -1149,6 +1231,7 @@
             navHome.classList.remove('bg-goldAcc/10', 'text-goldAcc', 'border', 'border-goldAcc/30');
             navCourses.classList.remove('bg-goldAcc/10', 'text-goldAcc', 'border', 'border-goldAcc/30');
             navQuiz.classList.remove('bg-goldAcc/10', 'text-goldAcc', 'border', 'border-goldAcc/30');
+            if(navQuiz2) navQuiz2.classList.remove('bg-goldAcc/10', 'text-goldAcc', 'border', 'border-goldAcc/30');
             
             const navCaseFile = document.getElementById('nav-case-file-btn');
             if (navCaseFile) navCaseFile.classList.remove('bg-goldAcc/10', 'text-goldAcc', 'border', 'border-goldAcc/30');
@@ -1164,6 +1247,8 @@
                 navCourses.classList.add('bg-goldAcc/10', 'text-goldAcc', 'border', 'border-goldAcc/30');
             } else if (currentView === 'quiz') {
                 navQuiz.classList.add('bg-goldAcc/10', 'text-goldAcc', 'border', 'border-goldAcc/30');
+            } else if (currentView === 'quiz2') {
+                if(navQuiz2) navQuiz2.classList.add('bg-goldAcc/10', 'text-goldAcc', 'border', 'border-goldAcc/30');
             } else if (currentView === 'case-file') {
                 if (navCaseFile) navCaseFile.classList.add('bg-goldAcc/10', 'text-goldAcc', 'border', 'border-goldAcc/30');
             } else if (currentView.startsWith('lesson_')) {
@@ -1250,7 +1335,7 @@
             }
         }
 
-        // --- QUIZ LOGIC FUNCTIONS --- //
+        // --- QUIZ 1 LOGIC FUNCTIONS --- //
         
         function checkQuizPassword() {
             const pwdInput = document.getElementById('quiz-password');
@@ -1343,6 +1428,103 @@
             
             // Scroll otomatis ke hasil kuis
             window.scrollTo({ top: document.getElementById('view-quiz').offsetTop - 20, behavior: 'smooth' });
+        }
+
+
+        // --- QUIZ 2 LOGIC FUNCTIONS (Bab 7-8) --- //
+        
+        function checkQuiz2Password() {
+            const pwdInput = document.getElementById('quiz2-password');
+            const errorMsg = document.getElementById('quiz2-error');
+            
+            // Menggunakan password yang sama seperti kuis pertama (14140)
+            if (pwdInput.value === '14140') {
+                errorMsg.classList.add('hidden');
+                document.getElementById('quiz2-auth').classList.add('hidden');
+                
+                // Jika sudah pernah ikut, langsung ke result
+                if (hasTakenQuiz2) {
+                    document.getElementById('quiz2-result').classList.remove('hidden');
+                } else {
+                    document.getElementById('quiz2-content').classList.remove('hidden');
+                    renderQuiz2();
+                }
+            } else {
+                errorMsg.classList.remove('hidden');
+                pwdInput.value = ''; // Reset input on wrong password
+            }
+        }
+
+        function renderQuiz2() {
+            const container = document.getElementById('quiz2-questions-container');
+            let html = '';
+            
+            quiz2Questions.forEach((item, index) => {
+                html += `
+                    <div class="bg-darkBg p-6 rounded-lg border border-borderCol/60 hover:border-borderCol transition-colors">
+                        <p class="font-bold text-white mb-4 leading-relaxed"><span class="text-goldAcc mr-2">Soal ${index + 1}.</span> ${item.q}</p>
+                        <div class="space-y-3 pl-4 sm:pl-8">
+                `;
+                
+                item.options.forEach((opt, optIdx) => {
+                    html += `
+                        <label class="flex items-start cursor-pointer group">
+                            <input type="radio" name="q2_${index}" value="${optIdx}" class="mt-1 mr-3 accent-goldAcc cursor-pointer flex-shrink-0">
+                            <span class="text-gray-400 group-hover:text-goldAcc transition-colors text-sm sm:text-base">${opt}</span>
+                        </label>
+                    `;
+                });
+                
+                html += `</div></div>`;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        function submitQuiz2() {
+            if (hasTakenQuiz2) return;
+            
+            let score = 0;
+            let allAnswered = true;
+            
+            quiz2Questions.forEach((item, index) => {
+                const selected = document.querySelector(`input[name="q2_${index}"]:checked`);
+                if (!selected) {
+                    allAnswered = false;
+                } else if (parseInt(selected.value) === item.a) {
+                    score++;
+                }
+            });
+            
+            const validationError = document.getElementById('quiz2-validation-error');
+            if (!allAnswered) {
+                validationError.classList.remove('hidden');
+                return;
+            } else {
+                validationError.classList.add('hidden');
+            }
+            
+            // Set state to completed
+            quiz2Score = score;
+            hasTakenQuiz2 = true;
+            
+            // Toggle Display
+            document.getElementById('quiz2-content').classList.add('hidden');
+            document.getElementById('quiz2-result').classList.remove('hidden');
+            document.getElementById('quiz2-score-display').textContent = `${score}/15`;
+            
+            // Generate Feedback
+            const feedback = document.getElementById('quiz2-feedback');
+            if (score === 15) {
+                feedback.innerHTML = '<span class="text-green-500 font-bold block mb-2">Luar Biasa!</span> "Sempurna! Analisis Anda terhadap ancaman makhluk magis tingkat tinggi benar-benar sempurna."';
+            } else if (score >= 10) {
+                feedback.innerHTML = '<span class="text-yellow-500 font-bold block mb-2">Cukup Baik</span> "Pengetahuan yang solid. Walau begitu, jangan sampai tergores oleh ekor Blast-Ended Skrewt di dunia nyata."';
+            } else {
+                feedback.innerHTML = '<span class="text-red-500 font-bold block mb-2">Sangat Kurang</span> "Mengecewakan. Jika ini adalah pertempuran sungguhan, Anda mungkin sudah terbakar oleh serangan Fire Crab."';
+            }
+            
+            // Scroll otomatis ke hasil kuis
+            window.scrollTo({ top: document.getElementById('view-quiz2').offsetTop - 20, behavior: 'smooth' });
         }
 
 
